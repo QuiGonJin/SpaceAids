@@ -69,7 +69,8 @@ class SuicideBomber: SKSpriteNode, enemy, enemyWatchDelegate {
     }
     
     func reset() {
-        self.isHidden = false
+        self.removeAllActions()
+        self.isHidden = true
         self.hp = baseHP
     }
     

@@ -52,12 +52,15 @@ class enemyGroup:SKNode, enemy, enemyWatchDelegate {
         for i in 0..<(self.enemySprites?.spriteCollection.count)! {
             let sprite = self.enemySprites?.spriteCollection[i];
             let enemy = self.enemySprites?.spriteCollection[i] as! enemy;
-        
+            
+            //wrap in run to make duration 0
+            let actionWrapper = SKAction.run {
+                sprite?.isHidden = false
+                sprite?.run(action)
+            }
+            
             if let enemySpecialAction = enemy.action() {
-                //wrap in run to make duration 0
-                let actionWrapper = SKAction.run {
-                    sprite?.run(action)
-                }
+                
                 
                 let myAction = SKAction.sequence([
                     SKAction.wait(forDuration: Double(i) * spacing),
@@ -69,7 +72,7 @@ class enemyGroup:SKNode, enemy, enemyWatchDelegate {
             } else {
                 let spawnAction = SKAction.sequence([
                     SKAction.wait(forDuration: Double(i) * spacing),
-                    action
+                    actionWrapper
                     ])
                 
                 sprite?.run(spawnAction)

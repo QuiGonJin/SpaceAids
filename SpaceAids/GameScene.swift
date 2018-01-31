@@ -10,6 +10,8 @@ import SpriteKit
 import GameplayKit
 import UIKit
 
+var mainScene: GameScene?;
+
 enum BitMasksEnum {
     static let BLOCK_CONTACT_BM:UInt32 = 1
     static let HIT_CONTACT_BM:UInt32 = 2
@@ -57,6 +59,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         super.init(size: CGSize(width: size.width, height: size.height))
         self.physicsWorld.gravity = CGVector(dx: 0, dy: 0);
         self.physicsWorld.contactDelegate = self
+        mainScene = self
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -110,6 +113,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         rightSpawner = Spawner(scene: self, position: CGPoint(x: (w/4), y: h+100), horizontalRange: w/2 - 100)
 
         leftSpawner?.initEnemyGroup(type: enemyTypeEnum.FIGHTER, length: 5)
+        leftSpawner?.initEnemyGroup(type: enemyTypeEnum.FIGHTER, length: 5)
         leftSpawner?.initEnemyGroup(type: enemyTypeEnum.SUICIDE, length: 5)
         leftSpawner?.initEnemyGroup(type: enemyTypeEnum.LILBASTERD, length: 5)
 
@@ -122,7 +126,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         turret?.position = CGPoint(x: 0, y: 100)
         UIOverlay.addChild(turret!)
         
-        self.currentWeapon = Rifle(scene: self)
+//        self.currentWeapon = Rifle(scene: self)
+//        currentWeapon?.activate()
+
+        self.currentWeapon = Magnum(scene: self)
         currentWeapon?.activate()
     }
 

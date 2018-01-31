@@ -91,8 +91,11 @@ class Fighter: SKSpriteNode, enemy, enemyWatchDelegate {
         linePath.addLine(to: CGPoint(x: 0, y: -3000))
         
         let action = SKAction.run({
-            let bullet: Bullet = Bullet(position: self.position, size: CGSize(width: 50, height: 50), delegate: nil)
-            let action = SKAction.follow(linePath.cgPath, asOffset: true, orientToPath: false, duration: 3.0)
+            //get this node's position inside of enemyGroup relative to gamescene
+            let p = self.parent?.convert(self.position, to: (mainScene)!)
+            
+            let bullet: Bullet = Bullet(position: p!, size: CGSize(width: 50, height: 50), delegate: nil)
+            let action = SKAction.follow(linePath.cgPath, asOffset: true, orientToPath: false, speed: 800)
             
             let delete = SKAction.run({
                 bullet.destroy()
@@ -103,7 +106,8 @@ class Fighter: SKSpriteNode, enemy, enemyWatchDelegate {
                     delete
             ])
             bullet.run(seq)
-            self.parent?.addChild(bullet)
+//            self.parent?.addChild(bullet)
+            mainScene?.addChild(bullet)
         });
         
         let seq = SKAction.sequence([
@@ -140,7 +144,8 @@ class Fighter: SKSpriteNode, enemy, enemyWatchDelegate {
     }
     
     func reset() {
-        self.isHidden = false
+        self.removeAllActions()
+        self.isHidden = true
         self.hp = baseHP
     }
     
@@ -201,8 +206,11 @@ class LilBasterd: SKSpriteNode, enemy, enemyWatchDelegate {
         linePath.addLine(to: CGPoint(x: 0, y: -3000))
         
         let action = SKAction.run({
-            let bullet: Bullet = Bullet(position: self.position, size: CGSize(width: 50, height: 50), delegate: nil)
-            let action = SKAction.follow(linePath.cgPath, asOffset: true, orientToPath: false, duration: 3.0)
+            //get this node's position inside of enemyGroup relative to gamescene
+            let p = self.parent?.convert(self.position, to: (mainScene)!)
+            
+            let bullet: Bullet = Bullet(position: p!, size: CGSize(width: 50, height: 50), delegate: nil)
+            let action = SKAction.follow(linePath.cgPath, asOffset: true, orientToPath: false, speed: 800)
             
             let delete = SKAction.run({
                 bullet.destroy()
@@ -213,7 +221,8 @@ class LilBasterd: SKSpriteNode, enemy, enemyWatchDelegate {
                 delete
                 ])
             bullet.run(seq)
-            self.parent?.addChild(bullet)
+//            self.parent?.addChild(bullet)
+            mainScene?.addChild(bullet)
         });
         
         let randDuration = ( CGFloat(arc4random_uniform(101)) / 100 ) * 3.0
@@ -234,7 +243,8 @@ class LilBasterd: SKSpriteNode, enemy, enemyWatchDelegate {
     }
     
     func reset() {
-        self.isHidden = false
+        self.removeAllActions()
+        self.isHidden = true
         self.hp = baseHP
     }
     
