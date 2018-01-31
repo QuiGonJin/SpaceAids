@@ -48,7 +48,7 @@ class enemyGroup:SKNode, enemy, enemyWatchDelegate {
         }
     }
     
-    func spawnGroup(action: SKAction, duration: TimeInterval, spacing: TimeInterval){
+    func spawnGroup(action: SKAction, spacing: TimeInterval){
         for i in 0..<(self.enemySprites?.spriteCollection.count)! {
             let sprite = self.enemySprites?.spriteCollection[i];
             let enemy = self.enemySprites?.spriteCollection[i] as! enemy;
@@ -268,7 +268,7 @@ class Spawner: enemyWatchDelegate{
     }
     
     
-    func spawnNextGroup(duration: TimeInterval){
+    func spawnNextGroup(speed: CGFloat){
         guard let group = enemyGroups.popLast() else {
             print("no groups available")
             return
@@ -277,9 +277,9 @@ class Spawner: enemyWatchDelegate{
         let curve = buildPath(type: group.type)
         
         self.scene.addChild(group)
-        let action = SKAction.follow(curve!, asOffset: true, orientToPath: true, duration: duration)
-
-        group.spawnGroup(action: action, duration: 6.0, spacing: 0.5)
+        let action = SKAction.follow(curve!, asOffset: true, orientToPath: true, speed: speed)
+        
+        group.spawnGroup(action: action, spacing: Double(200/speed))
     }
     
 }

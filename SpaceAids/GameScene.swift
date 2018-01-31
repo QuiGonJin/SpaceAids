@@ -30,14 +30,7 @@ protocol enemyWatchDelegate {
     func didDestroyEnemy(node: enemy)
 }
 
-
 class GameScene: SKScene, SKPhysicsContactDelegate {
-    //hitscan
-    var deltaFrames = 0
-    var ROF:Int = 6 //frames : scan
-    var SCAN_LENGTH:CGFloat = 3000
-    var damage = 1
-    
     //Default crap
     var lastUpdateTime : TimeInterval = 0
     let displaySize: CGRect = UIScreen.main.bounds
@@ -55,11 +48,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var lastSpawned: TimeInterval = 10.0
     var spawnDelay: TimeInterval = 4.0
     
-    //Bullet Sprites... so cancer
-//    var hitscanSprite: SKSpriteNode?
-    var hitscanCollection:SpriteCollection?
-    var renderHS: Bool = false;
-    var HSIndex: Int = 0;
+    //Weapon
+    var currentWeapon: weapon?
     
     var cam: SKCameraNode?
 
@@ -74,12 +64,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     override func sceneDidLoad() {
-        print("U wot")
         //default crap
         self.lastUpdateTime = 0
         screenSize = getVisibleScreen(sceneWidth: self.frame.width, sceneHeight: self.frame.height, viewWidth: UIScreen.main.bounds.width, viewHeight: UIScreen.main.bounds.height)
-        
-        self.SCAN_LENGTH = sqrt(pow(self.frame.height, 2) + pow(self.frame.width/2, 2))
         
         //Camera
         //Move camera such that anchor is center bottom screen
@@ -116,7 +103,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         self.testNode.zPosition = 10
         self.testNode.position = CGPoint(x: 0, y: 200)
 
-        
         let w = (screenSize?.width)!
         let h = (screenSize?.height)!
         
@@ -135,30 +121,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         turret = SKSpriteNode(color: UIColor.blue, size: CGSize(width: 200, height: 200));
         turret?.position = CGPoint(x: 0, y: 100)
         UIOverlay.addChild(turret!)
-
-        let HS1: SKSpriteNode = SKSpriteNode(color: UIColor.green, size: CGSize(width: 5, height: 3000));
-        let HS2: SKSpriteNode = SKSpriteNode(color: UIColor.cyan, size: CGSize(width: 5, height: 3000));
-        let HS3: SKSpriteNode = SKSpriteNode(color: UIColor.yellow, size: CGSize(width: 5, height: 3000));
         
-        var hitscanSprites = [SKSpriteNode]();
-        HS1.anchorPoint = CGPoint(x: 0.5, y: 1)
-        HS1.position = CGPoint(x: 0, y: 0)
-        HS1.isHidden = true
-        hitscanSprites.append(HS1)
-        self.addChild(hitscanSprites[0])
-        
-        HS2.anchorPoint = CGPoint(x: 0.5, y: 1)
-        HS2.position = CGPoint(x: 0, y: 0)
-        HS2.isHidden = false
-        hitscanSprites.append(HS2)
-        self.addChild(hitscanSprites[1])
-        
-        HS3.anchorPoint = CGPoint(x: 0.5, y: 1)
-        HS3.position = CGPoint(x: 0, y: 0)
-        HS3.isHidden = true
-        hitscanSprites.append(HS3)
-        self.addChild(hitscanSprites[2])
-        hitscanCollection = SpriteCollection(collection:hitscanSprites)
+        self.currentWeapon = Rifle(scene: self)
+        currentWeapon?.activate()
     }
 
     
@@ -250,56 +215,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                     if(touch.position.x > 0){
                         theta = theta * -1
                     }
-                    
                 }
            
-            let farEndPoint = CGPoint(x: -SCAN_LENGTH*sin(theta) + turret!.position.x, y: SCAN_LENGTH*cos(theta) + turret!.position.y)
             self.turret?.zRotation = theta
-            
-            if(deltaFrames > ROF){
-                self.hitscan(angleFromYAxis: theta, start: (self.turret?.position)!, end: farEndPoint)
-            }
-        }
-    }
-    
-    func hitscan(angleFromYAxis:CGFloat, start:CGPoint, end:CGPoint){
-        var hitNode: SKNode?;
-        var hitPosition: CGPoint?;
-        
-        self.physicsWorld.enumerateBodies(alongRayStart: start, end: end,
-              using: { (body, point, normal, stop) in
-                if(body.categoryBitMask >= BitMasksEnum.BLOCK_CONTACT_BM){
-                    hitNode = body.node
-                    hitPosition = point
-                    stop.pointee = true
-                }
-            }
-        )
-        if let _ = hitNode {
-            self.renderHitscan(angle: angleFromYAxis, start: hitPosition!, end: start)
-            self.handleHitscanEvents(node: hitNode, point: hitPosition)
-        } else {
-            self.renderHitscan(angle: angleFromYAxis, start: end, end: start)
-        }
 
-        self.deltaFrames = 0
-    }
-    
-    func handleHitscanEvents(node: SKNode?, point: CGPoint?){
-        if let hitNode = node as? enemy{         
-            hitNode.hit(point: point!, damage: self.damage)
-        }
-    }
-
-    //Hitscan Sprites are rendered backwards, starting from target back to their source
-    func renderHitscan(angle: CGFloat, start: CGPoint, end: CGPoint){
-        let HSSprite = hitscanCollection?.getNext()
-        HSSprite?.isHidden = false
-        HSSprite?.position = start
-        HSSprite?.zRotation = angle
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
-            HSSprite?.isHidden = true
+            self.currentWeapon?.fire(theta: theta)
         }
     }
     
@@ -312,14 +232,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
     }
     
-    
-    
     //update funcs
     override func update(_ currentTime: TimeInterval) {
         self.lastUpdateTime = currentTime
         let dt = currentTime - lastSpawned
         if(dt > spawnDelay){
-            leftSpawner?.spawnNextGroup(duration: 6.0)
+            leftSpawner?.spawnNextGroup(speed: 700)
 //            rightSpawner?.spawnNextGroup(duration: 6.0)
             self.lastSpawned = currentTime
         }
@@ -332,7 +250,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     override func didFinishUpdate() {
-        deltaFrames+=1
+        self.currentWeapon?.deltaFramesLastFired+=1
     }
 }
 
