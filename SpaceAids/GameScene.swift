@@ -129,7 +129,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 //        self.currentWeapon = Rifle(scene: self)
 //        currentWeapon?.activate()
 
-        self.currentWeapon = Magnum(scene: self)
+//        self.currentWeapon = Magnum(scene: self)
+//        currentWeapon?.activate()
+
+        self.currentWeapon = Shotgun(scene: self)
         currentWeapon?.activate()
     }
 

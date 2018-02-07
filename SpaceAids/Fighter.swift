@@ -120,9 +120,11 @@ class Fighter: SKSpriteNode, enemy, enemyWatchDelegate {
     
     //enemy prototype funcs
     func hit(point: CGPoint, damage: Int){
-        self.hp -= damage
-        if(hp <= 0){
-            self.destroy()
+        if(self.hp > 0 ){
+            self.hp -= damage
+            if(hp <= 0){
+                self.destroy()
+            }
         }
     }
     
@@ -184,9 +186,11 @@ class LilBasterd: SKSpriteNode, enemy, enemyWatchDelegate {
     
     //enemy prototype funcs
     func hit(point: CGPoint, damage: Int){
-        self.hp -= damage
-        if(hp <= 0){
-            self.destroy()
+        if(self.hp > 0 ){
+            self.hp -= damage
+            if(hp <= 0){
+                self.destroy()
+            }
         }
     }
     
@@ -280,9 +284,11 @@ class Bullet: SKSpriteNode, enemy, enemyWatchDelegate {
     
     //enemy prototype funcs
     func hit(point: CGPoint, damage: Int){
-        self.hp -= damage
-        if(hp <= 0){
-            self.destroy()
+        if(self.hp > 0 ){
+            self.hp -= damage
+            if(hp <= 0){
+                self.destroy()
+            }
         }
     }
     
