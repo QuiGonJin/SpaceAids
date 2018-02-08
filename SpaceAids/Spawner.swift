@@ -48,20 +48,21 @@ class enemyGroup:SKNode, enemy, enemyWatchDelegate {
         }
     }
     
-    func spawnGroup(action: SKAction, spacing: TimeInterval){
+    func spawnGroup(action: SKAction, spacing: TimeInterval, level: Int){
         for i in 0..<(self.enemySprites?.spriteCollection.count)! {
             let sprite = self.enemySprites?.spriteCollection[i];
-            let enemy = self.enemySprites?.spriteCollection[i] as! enemy;
+            var enemy = self.enemySprites?.spriteCollection[i] as! enemy;
+            
+            enemy.hp += level
             
             //wrap in run to make duration 0
             let actionWrapper = SKAction.run {
                 sprite?.isHidden = false
                 sprite?.run(action)
             }
+
+            if let enemySpecialAction = enemy.action(level: level) {
             
-            if let enemySpecialAction = enemy.action() {
-                
-                
                 let myAction = SKAction.sequence([
                     SKAction.wait(forDuration: Double(i) * spacing),
                     actionWrapper,
@@ -115,7 +116,7 @@ class enemyGroup:SKNode, enemy, enemyWatchDelegate {
         };
     }
     
-    func action() -> SKAction? {
+    func action(level: Int) -> SKAction? {
         return nil
     }
     
@@ -157,7 +158,7 @@ class Spawner: enemyWatchDelegate{
         case enemyTypeEnum.SUICIDE:
             var sprites = [SKSpriteNode]();
             for _ in 0..<length {
-                let suicideBomber = SuicideBomber(position: CGPoint(x: 0, y: 0), size: CGSize(width: 100, height: 100), delegate: nil)
+                let suicideBomber = SuicideBomber(position: CGPoint(x: 0, y: 0), size: CGSize(width: 140, height: 140), delegate: nil)
                 sprites.append(suicideBomber)
             }
             let collection = SpriteCollection(collection: sprites)
@@ -271,7 +272,7 @@ class Spawner: enemyWatchDelegate{
     }
     
     
-    func spawnNextGroup(speed: CGFloat){
+    func spawnNextGroup(speed: CGFloat, level: Int){
         guard let group = enemyGroups.popLast() else {
             print("no groups available")
             return
@@ -282,7 +283,7 @@ class Spawner: enemyWatchDelegate{
         self.scene.addChild(group)
         let action = SKAction.follow(curve!, asOffset: true, orientToPath: true, speed: speed)
         
-        group.spawnGroup(action: action, spacing: Double(200/speed))
+        group.spawnGroup(action: action, spacing: Double(200/speed), level: level)
     }
     
 }

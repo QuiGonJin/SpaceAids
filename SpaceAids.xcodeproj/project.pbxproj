@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		E26BB8D92009D73600B5A4B7 /* SuicideBomber.swift in Sources */ = {isa = PBXBuildFile; fileRef = E26BB8D82009D73600B5A4B7 /* SuicideBomber.swift */; };
 		E26BB8DB2009E07C00B5A4B7 /* PathBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = E26BB8DA2009E07C00B5A4B7 /* PathBuilder.swift */; };
 		E26BB8DD200DC85F00B5A4B7 /* SpriteCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = E26BB8DC200DC85F00B5A4B7 /* SpriteCollection.swift */; };
 		E26BB8DF200F19E100B5A4B7 /* Spawner.swift in Sources */ = {isa = PBXBuildFile; fileRef = E26BB8DE200F19E100B5A4B7 /* Spawner.swift */; };
@@ -22,7 +21,7 @@
 		E29C16D020033247002BAAF2 /* SpaceAidsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E29C16CF20033247002BAAF2 /* SpaceAidsTests.swift */; };
 		E29C16DB20033247002BAAF2 /* SpaceAidsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E29C16DA20033247002BAAF2 /* SpaceAidsUITests.swift */; };
 		E29C16E92003328F002BAAF2 /* MainMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = E29C16E82003328F002BAAF2 /* MainMenu.swift */; };
-		E2AFC15D20143AAB0045725A /* Fighter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2AFC15C20143AAB0045725A /* Fighter.swift */; };
+		E2AFC15D20143AAB0045725A /* Enemy.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2AFC15C20143AAB0045725A /* Enemy.swift */; };
 		E2AFC15F202190560045725A /* Weapon.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2AFC15E202190560045725A /* Weapon.swift */; };
 /* End PBXBuildFile section */
 
@@ -44,7 +43,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		E26BB8D82009D73600B5A4B7 /* SuicideBomber.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuicideBomber.swift; sourceTree = "<group>"; };
 		E26BB8DA2009E07C00B5A4B7 /* PathBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PathBuilder.swift; sourceTree = "<group>"; };
 		E26BB8DC200DC85F00B5A4B7 /* SpriteCollection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpriteCollection.swift; sourceTree = "<group>"; };
 		E26BB8DE200F19E100B5A4B7 /* Spawner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Spawner.swift; sourceTree = "<group>"; };
@@ -65,7 +63,7 @@
 		E29C16DA20033247002BAAF2 /* SpaceAidsUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpaceAidsUITests.swift; sourceTree = "<group>"; };
 		E29C16DC20033247002BAAF2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E29C16E82003328F002BAAF2 /* MainMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMenu.swift; sourceTree = "<group>"; };
-		E2AFC15C20143AAB0045725A /* Fighter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Fighter.swift; sourceTree = "<group>"; };
+		E2AFC15C20143AAB0045725A /* Enemy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Enemy.swift; sourceTree = "<group>"; };
 		E2AFC15E202190560045725A /* Weapon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Weapon.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -127,11 +125,10 @@
 				E29C16C320033247002BAAF2 /* LaunchScreen.storyboard */,
 				E29C16C620033247002BAAF2 /* Info.plist */,
 				E29C16E82003328F002BAAF2 /* MainMenu.swift */,
-				E26BB8D82009D73600B5A4B7 /* SuicideBomber.swift */,
 				E26BB8DA2009E07C00B5A4B7 /* PathBuilder.swift */,
 				E26BB8DC200DC85F00B5A4B7 /* SpriteCollection.swift */,
 				E26BB8DE200F19E100B5A4B7 /* Spawner.swift */,
-				E2AFC15C20143AAB0045725A /* Fighter.swift */,
+				E2AFC15C20143AAB0045725A /* Enemy.swift */,
 				E2AFC15E202190560045725A /* Weapon.swift */,
 			);
 			path = SpaceAids;
@@ -292,14 +289,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				E26BB8DF200F19E100B5A4B7 /* Spawner.swift in Sources */,
-				E2AFC15D20143AAB0045725A /* Fighter.swift in Sources */,
+				E2AFC15D20143AAB0045725A /* Enemy.swift in Sources */,
 				E26BB8DB2009E07C00B5A4B7 /* PathBuilder.swift in Sources */,
 				E29C16BB20033247002BAAF2 /* GameScene.swift in Sources */,
 				E29C16BD20033247002BAAF2 /* GameViewController.swift in Sources */,
 				E2AFC15F202190560045725A /* Weapon.swift in Sources */,
 				E29C16B520033247002BAAF2 /* AppDelegate.swift in Sources */,
 				E29C16E92003328F002BAAF2 /* MainMenu.swift in Sources */,
-				E26BB8D92009D73600B5A4B7 /* SuicideBomber.swift in Sources */,
 				E26BB8DD200DC85F00B5A4B7 /* SpriteCollection.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
