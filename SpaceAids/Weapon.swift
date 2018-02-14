@@ -38,6 +38,7 @@ class Turret: SKSpriteNode {
         self.myScene = scene
         self.name = "turret"
         self.weapons.append(Rifle(scene: myScene!, turret: self))
+        self.weapons.append(Magnum(scene: myScene!, turret: self))
         
         self.activeWeapon = self.weapons[0]
         activeWeapon?.activate()
@@ -195,12 +196,15 @@ class Magnum: weapon {
     var ready: Bool = false
     var readyDelay: TimeInterval = 0.4
     var reloadDelay: TimeInterval = 1.8
+    var turret: SKNode
     var ammo = 0
     var magazineSize = 6
-    init(scene: GameScene){
+    
+    init(scene: GameScene, turret: SKNode){
         self.SCAN_LENGTH = sqrt(pow(scene.frame.height, 2) + pow(scene.frame.width/2, 2))
         self.scene = scene
         self.ammo = self.magazineSize
+        self.turret = turret
         //init sprites
         let HS3: SKSpriteNode = SKSpriteNode(color: UIColor.yellow, size: CGSize(width: 10, height: 3000));
         
@@ -213,6 +217,7 @@ class Magnum: weapon {
         
         projectileSprites = SpriteCollection(collection:hitscanSprites)
     }
+
     
     func activate() {
         for i in 0..<projectileSprites.spriteCollection.count {

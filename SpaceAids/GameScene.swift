@@ -39,6 +39,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var screenSize: CGRect?
 
     var UIOverlay: SKNode = SKNode();
+    var turrets : [Turret] = [Turret]();
     var turret : Turret?
     var toggleWeaponButton: SKSpriteNode?
     var scoreLabel: SKLabelNode?
@@ -50,7 +51,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var score: Int = 0
     var upgradeScore: Int = 0
     var lastLevelUp: TimeInterval = 0
-    var currentWeapon: weapon?
     var rifle: weapon?
     var magnum: weapon?
     var weaponIndex = 0;
@@ -105,10 +105,15 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         self.UIOverlay.addChild(bottomBar)
         
         //turret
-//        turret = SKSpriteNode(color: UIColor.blue, size: CGSize(width: 200, height: 200));
         turret = Turret(scene: self, size: CGSize(width: 200, height: 200))
         turret?.position = CGPoint(x: 200, y: 100)
         UIOverlay.addChild(turret!)
+        turrets.append(turret!)
+        
+        let turret2 = Turret(scene: self, size: CGSize(width: 200, height: 200))
+        turret2.position = CGPoint(x: -200, y: 100)
+        UIOverlay.addChild(turret2)
+        turrets.append(turret2)
         
         //toggle weapon
         toggleWeaponButton = SKSpriteNode(color: UIColor.green, size: CGSize(width: 200, height: 200));
@@ -144,13 +149,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         rightSpawner?.initEnemyGroup(type: enemyTypeEnum.SUICIDE, length: 1)
         rightSpawner?.initEnemyGroup(type: enemyTypeEnum.LILBASTERD, length: 5)
         rightSpawner?.initEnemyGroup(type: enemyTypeEnum.FIGHTER, length: 3)
-
-        self.rifle = Rifle(scene: self, turret: self.turret!)
-        self.magnum = Magnum(scene: self)
         
-        self.currentWeapon = self.rifle
-        currentWeapon?.activate()
-        currentWeapon?.ready = true
     }
 
     
@@ -216,7 +215,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         } else {
             let touchedNode = UIOverlay.atPoint(point)
             if(touchedNode.name == "toggleWeaponButton"){
-                toggleWeapon()
+                turret?.toggleWeapon()
             }
         }
     }
@@ -238,39 +237,35 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         return CGFloat(hypotf(Float(second.x - first.x), Float(second.y - first.y)));
     }
     
-    func toggleWeapon(){
-        self.weaponIndex += 1
-        if(self.weaponIndex > 1){
-            self.weaponIndex = 0
-        }
-        //rifle
-        if(self.weaponIndex == 0){
-            self.currentWeapon?.deactivate()
-            self.currentWeapon = self.rifle
-            currentWeapon?.activate()
-        } else
-        //magnum
-        if(self.weaponIndex == 1){
-            self.currentWeapon?.deactivate()
-            self.currentWeapon = self.magnum
-            currentWeapon?.activate()
-        }
-    }
-    
     func fire(){
+//        if let touch = self.touchNode {
+//            var theta:CGFloat = 0;
+//            theta = atan( ( touch.position.x - turret!.position.x ) / (touch.position.y - turret!.position.y ) ) * -1
+//                if(touch.position.y <= self.turret!.position.y){
+//                    theta = CGFloat.pi/2;
+//                    if(touch.position.x > 0){
+//                        theta = theta * -1
+//                    }
+//                }
+//
+//            self.turret?.zRotation = theta
+//            self.turret?.activeWeapon?.fire(theta: theta)
+//        }
+        
         if let touch = self.touchNode {
-            var theta:CGFloat = 0;
-            theta = atan( ( touch.position.x - turret!.position.x ) / (touch.position.y - turret!.position.y ) ) * -1
-                if(touch.position.y <= self.turret!.position.y){
-                    theta = CGFloat.pi/2;
-                    if(touch.position.x > 0){
-                        theta = theta * -1
+            for tur in turrets {
+                var theta:CGFloat = 0;
+                theta = atan( ( touch.position.x - tur.position.x ) / (touch.position.y - tur.position.y ) ) * -1
+                    if(touch.position.y <= tur.position.y){
+                        theta = CGFloat.pi/2;
+                        if(touch.position.x > 0){
+                            theta = theta * -1
+                        }
                     }
-                }
-           
-            self.turret?.zRotation = theta
-//            self.currentWeapon?.fire(theta: theta)
-            self.turret?.activeWeapon?.fire(theta: theta)
+    
+                tur.zRotation = theta
+                tur.activeWeapon?.fire(theta: theta)
+            }
         }
     }
     
@@ -366,8 +361,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     override func didFinishUpdate() {
-//        self.currentWeapon?.deltaFramesLastFired+=1
-        self.turret?.activeWeapon?.deltaFramesLastFired+=1
+        for tur in turrets {
+            tur.activeWeapon?.deltaFramesLastFired+=1
+        }
+//        self.turret?.activeWeapon?.deltaFramesLastFired+=1
     }
 }
 
