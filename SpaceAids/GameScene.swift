@@ -50,19 +50,16 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var level: Int = 1
     var score: Int = 0
     var upgradeScore: Int = 0
-    var lastLevelUp: TimeInterval = 0
+
     var rifle: weapon?
     var magnum: weapon?
     var weaponIndex = 0;
     var cam: SKCameraNode?
     
     //enemies
-    var rightSpawner: Spawner?
-    var leftSpawner: Spawner?
-    var lastSpawned: TimeInterval = 10.0
-    var spawnDelay: TimeInterval = 7.0
-    var spawnSide: Int = 0
-    var spawnSpeed: CGFloat = 300
+    var spawner: EnemyGenerator?
+    var lastSpawned: TimeInterval = 0
+    var spawnDelay: TimeInterval = 0
 
     override init(size: CGSize) {
         super.init(size: CGSize(width: size.width, height: size.height))
@@ -115,6 +112,15 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         UIOverlay.addChild(turret2)
         turrets.append(turret2)
         
+        let turret3 = Turret(scene: self, size: CGSize(width: 200, height: 200))
+        turret3.position = CGPoint(x: 0, y: 100)
+        UIOverlay.addChild(turret3)
+        turrets.append(turret3)
+        
+        //spawner
+        self.spawner = EnemyGenerator(position: CGPoint(x: -w/2, y: h), horizontalRange: w);
+        self.addChild(spawner!);
+        
         //toggle weapon
         toggleWeaponButton = SKSpriteNode(color: UIColor.green, size: CGSize(width: 200, height: 200));
         toggleWeaponButton?.position = CGPoint(x: (w / 2) - 100, y: 100)
@@ -136,19 +142,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         self.touchNode?.isHidden = true
         self.touchNode?.position = CGPoint(x: 0, y: 0)
         self.UIOverlay.addChild((self.touchNode)!)
-        
-        
-        leftSpawner = Spawner(scene: self, position: CGPoint(x: -(w/4), y: h+100), horizontalRange: w/2 - 100)
-        rightSpawner = Spawner(scene: self, position: CGPoint(x: (w/4), y: h+100), horizontalRange: w/2 - 100)
-
-        
-        leftSpawner?.initEnemyGroup(type: enemyTypeEnum.SUICIDE, length: 1)
-        leftSpawner?.initEnemyGroup(type: enemyTypeEnum.LILBASTERD, length: 5)
-        leftSpawner?.initEnemyGroup(type: enemyTypeEnum.FIGHTER, length: 3)
-
-        rightSpawner?.initEnemyGroup(type: enemyTypeEnum.SUICIDE, length: 1)
-        rightSpawner?.initEnemyGroup(type: enemyTypeEnum.LILBASTERD, length: 5)
-        rightSpawner?.initEnemyGroup(type: enemyTypeEnum.FIGHTER, length: 3)
+    
         
     }
 
@@ -298,65 +292,27 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
         
     }
-    
-    func levelUp(){
-        level += 1;
-        print("level up")
-        if(level%5 == 0){
-            print("spawn moar")
-            //allow max of 7 enemygroups
-            if (leftSpawner!.enemyGroups.count > 7){
-                leftSpawner?.enemyGroups.popLast()
-                rightSpawner?.enemyGroups.popLast()
-            }
-            let t = arc4random_uniform(3) + 1
-            if(t == enemyTypeEnum.SUICIDE){
-                let adds = Int(level/3)
-                leftSpawner?.initEnemyGroup(type: enemyTypeEnum.SUICIDE, length: 1 + adds)
-            } else if (t == enemyTypeEnum.FIGHTER){
-                let adds = Int(level/5)
-                leftSpawner?.initEnemyGroup(type: enemyTypeEnum.FIGHTER, length: 3 + adds)
-            } else if (t == enemyTypeEnum.LILBASTERD){
-                let adds = Int(level/5)
-                leftSpawner?.initEnemyGroup(type: enemyTypeEnum.LILBASTERD, length: 5 + adds)
-            }
-            
-        } else if (level%2 == 0) {
-            print("delaydown")
-            spawnDelay -= 0.1
-        } else {
-            print("speedup")
-            spawnSpeed += 10;
-        }
-        
-    }
 
     //update funcs
     override func update(_ currentTime: TimeInterval) {
         self.lastUpdateTime = currentTime
-        let dt = currentTime - lastSpawned
+        let dtSpawn = currentTime - lastSpawned
         
         //spawn
-        if(dt > spawnDelay){
-            if(spawnSide == 0){
-                spawnSide = 1
-                leftSpawner?.spawnNextGroup(speed: spawnSpeed, level: level)
-            } else {
-                spawnSide = 0
-                rightSpawner?.spawnNextGroup(speed: spawnSpeed, level: level)
+        if(dtSpawn >= spawnDelay){
+            let nextDelay = spawner!.spawnWave();
+            if(nextDelay > 0.0){
+                self.lastSpawned = currentTime
+                self.spawnDelay = nextDelay;
+            } else { //end of level
+                self.isPaused = true;
             }
-            self.lastSpawned = currentTime
         }
         
         if(touchNode?.isHidden == false){
             fire()
         }
-        
-        let dtLevel = currentTime - lastLevelUp
-        if(dt > 8.0){
-            levelUp()
-            self.lastLevelUp = currentTime
-        }
+
         
     }
     

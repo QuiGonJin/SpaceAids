@@ -173,8 +173,8 @@ class Rifle: weapon {
 //                    let startPos = CGPoint(x: (scene.turret?.position.x)! - 100, y: (scene.turret?.position.y)!);
                     let startPos = self.turret.position
                     print(startPos)
-                    let farEndPoint = CGPoint(x: -SCAN_LENGTH*sin(theta) + scene.turret!.position.x,
-                                              y: SCAN_LENGTH*cos(theta) + scene.turret!.position.y)
+                    let farEndPoint = CGPoint(x: -SCAN_LENGTH*sin(theta) + self.turret.position.x,
+                                              y: SCAN_LENGTH*cos(theta) + self.turret.position.y)
                     self.hitscan(angleFromYAxis: theta, start: startPos, end: farEndPoint)
                     self.ammo -= 1
                 }

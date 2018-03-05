@@ -38,6 +38,7 @@ class enemyGroup:SKNode, enemy, enemyWatchDelegate {
     convenience init(collection: SpriteCollection, frameSize: CGSize, delegate: enemyWatchDelegate, type: Int){
         self.init()
         
+        
         self.countActive = collection.spriteCollection.count
         self.frameSize = frameSize
         self.enemySprites = collection
