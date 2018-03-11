@@ -55,10 +55,24 @@ class EnemyGenerator: SKNode, enemyWatchDelegate {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func didDestroyEnemy(node: enemy) {
+    func didDestroyEnemy(node: enemy, param: String?) {
         let n = node as! SKNode;
         n.removeAllActions();
         n.removeFromParent();
+        
+        guard let msg = param else {
+            return;
+        }
+        let params: [String] = msg.components(separatedBy: ",");
+        let type = params[0];
+        if(type == "crit"){
+            return;
+        } else if(type == "dead") {
+            mainScene?.enemyDestroyed(node: self, points: Int(params[1])!)
+            return;
+        } else if(type == "power"){
+            mainScene?.powerUp(type: Int(params[1])!);
+        }
     }
     
     func initPaths(){
@@ -216,7 +230,6 @@ class EnemyGenerator: SKNode, enemyWatchDelegate {
     
     func spawnLevel() {
         let delay = spawnWave();
-        print(levelIndex, delay)
         if(delay > 0){
             let seq = SKAction.sequence([
                     SKAction.wait(forDuration: delay),
@@ -257,6 +270,14 @@ class EnemyGenerator: SKNode, enemyWatchDelegate {
         if(type == enemyTypeEnum.BULLET){
             for _ in 0..<count {
                 let sprite = Bullet(position: CGPoint(x: 0, y: 0), size: CGSize(width: 50, height: 50), delegate: self);
+                sprite.isHidden = true;
+                ret.append(sprite);
+            }
+            return ret;
+        }
+        if(type == enemyTypeEnum.POWERUP){
+            for _ in 0..<count {
+                let sprite = PowerUp(position: CGPoint(x: 0, y: 0), size: CGSize(width: 100, height: 100), delegate: self);
                 sprite.isHidden = true;
                 ret.append(sprite);
             }

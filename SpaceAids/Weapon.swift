@@ -66,7 +66,7 @@ class Rifle: weapon {
     var projectileSprites: SpriteCollection
     var deltaFramesLastFired = 10
     var ROF:CGFloat = 8.33
-    var damage:Int = 1
+    var damage:Int = 10
     var ammo: Int = 0
     var magazineSize: Int = 30
     var SCAN_LENGTH:CGFloat = 3000
@@ -170,7 +170,6 @@ class Rifle: weapon {
             if(self.ammo > 0){
                 if(CGFloat(deltaFramesLastFired) > ROF){
                     let startPos = self.turret.position
-                    print(startPos)
                     let farEndPoint = CGPoint(x: -SCAN_LENGTH*sin(theta) + self.turret.position.x,
                                               y: SCAN_LENGTH*cos(theta) + self.turret.position.y)
                     self.hitscan(angleFromYAxis: theta, start: startPos, end: farEndPoint)
@@ -282,7 +281,6 @@ class Magnum: weapon {
             if(self.ammo > 0){
                 if(CGFloat(deltaFramesLastFired) > ROF){
                     let startPos = self.turret.position
-                    print(startPos)
                     let farEndPoint = CGPoint(x: -SCAN_LENGTH*sin(theta) + self.turret.position.x,
                                               y: SCAN_LENGTH*cos(theta) + self.turret.position.y)
                     self.hitscan(angleFromYAxis: theta, start: startPos, end: farEndPoint)

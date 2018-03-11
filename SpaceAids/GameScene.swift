@@ -29,7 +29,7 @@ protocol enemy {
 }
 
 protocol enemyWatchDelegate {
-    func didDestroyEnemy(node: enemy)
+    func didDestroyEnemy(node: enemy, param: String?)
 }
 
 protocol gameEventDelegate {
@@ -53,7 +53,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var health: Int = 100
     var level: Int = 1
     var score: Int = 0
-    var upgradeScore: Int = 0
 
     var rifle: weapon?
     var magnum: weapon?
@@ -207,7 +206,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
     }
     
-
     func fire(){
         if let touch = self.touchNode {
             for tur in turrets {
@@ -237,17 +235,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     func enemyDestroyed(node: SKNode, points: Int){
-        score += points;
-        upgradeScore += points;
-        if(upgradeScore > 3000){
-            upgradeScore = 0
-            upgradeWeapon()
-        }
+        self.score += points;
         self.scoreLabel?.text = String(score);
     }
     
-    func upgradeWeapon(){
-
+    func powerUp(type: Int){
+        print("power up " + String(type));
     }
     
     //update funcs
