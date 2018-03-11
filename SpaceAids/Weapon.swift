@@ -36,7 +36,7 @@ class Turret: SKSpriteNode {
     convenience init(scene: GameScene, size: CGSize){
         self.init(texture: nil, color: UIColor.blue, size: size)
         self.myScene = scene
-        self.name = "turret"
+        self.name = "Turret"
         self.weapons.append(Rifle(scene: myScene!, turret: self))
         self.weapons.append(Magnum(scene: myScene!, turret: self))
         
@@ -82,7 +82,7 @@ class Rifle: weapon {
         
         var hitscanSprites = [SKSpriteNode]();
         
-        for i in 0..<3 {
+        for _ in 0..<3 {
             let HS = SKSpriteNode(color: UIColor.green, size: CGSize(width: 5, height: 3000));
             
             HS.anchorPoint = CGPoint(x: 0.5, y: 1)
@@ -169,14 +169,12 @@ class Rifle: weapon {
         if(self.ready){
             if(self.ammo > 0){
                 if(CGFloat(deltaFramesLastFired) > ROF){
-                    print("alala")
-//                    let startPos = CGPoint(x: (scene.turret?.position.x)! - 100, y: (scene.turret?.position.y)!);
                     let startPos = self.turret.position
                     print(startPos)
                     let farEndPoint = CGPoint(x: -SCAN_LENGTH*sin(theta) + self.turret.position.x,
                                               y: SCAN_LENGTH*cos(theta) + self.turret.position.y)
                     self.hitscan(angleFromYAxis: theta, start: startPos, end: farEndPoint)
-                    self.ammo -= 1
+//                    self.ammo -= 1
                 }
             } else {
                 reload()
@@ -277,22 +275,22 @@ class Magnum: weapon {
         }
     }
     
+    
+    
     func fire(theta: CGFloat) {
-        print("mamam")
         if(self.ready){
-            print("alala")
             if(self.ammo > 0){
                 if(CGFloat(deltaFramesLastFired) > ROF){
-                    let farEndPoint = CGPoint(x: -SCAN_LENGTH*sin(theta) + scene.turret!.position.x,
-                                              y: SCAN_LENGTH*cos(theta) + scene.turret!.position.y)
-                    self.hitscan(angleFromYAxis: theta, start: (scene.turret?.position)!, end: farEndPoint)
-                    self.ammo -= 1
+                    let startPos = self.turret.position
+                    print(startPos)
+                    let farEndPoint = CGPoint(x: -SCAN_LENGTH*sin(theta) + self.turret.position.x,
+                                              y: SCAN_LENGTH*cos(theta) + self.turret.position.y)
+                    self.hitscan(angleFromYAxis: theta, start: startPos, end: farEndPoint)
+//                    self.ammo -= 1
                 }
             } else {
                 reload()
             }
         }
-        
     }
-    
 }

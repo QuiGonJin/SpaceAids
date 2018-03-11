@@ -10,6 +10,14 @@ import Foundation
 import UIKit
 import GameKit
 
+enum enemyTypeEnum {
+    static let SUICIDE:Int = 1
+    static let FIGHTER:Int = 2
+    static let LILBASTERD:Int = 3
+    static let BULLET:Int = 4
+    static let CARRIER:Int = 10
+}
+
 class CriticalSpot: SKSpriteNode, enemy {
     var hp: Int = 100
     var eventWatch: enemyWatchDelegate?
@@ -51,8 +59,7 @@ class CriticalSpot: SKSpriteNode, enemy {
         return
     }
     
-    func action(level: Int) -> SKAction? {
-        return nil
+    func action(level: Int) {
     }
 }
 
@@ -91,12 +98,11 @@ class SuicideBomber: SKSpriteNode, enemy, enemyWatchDelegate {
             return;
         }
         if(sNode.name == "CriticalSpot"){
-            self.hit(point: CGPoint(x: 0, y: 0), damage: 3)
+            self.hit(point: CGPoint(x: 0, y: 0), damage: 5)
         }
     }
     
-    func action(level: Int) -> SKAction? {
-        return nil
+    func action(level: Int) {
     }
     
     //enemy prototype funcs
@@ -157,7 +163,7 @@ class Fighter: SKSpriteNode, enemy, enemyWatchDelegate {
         self.addChild(critSpot as SKSpriteNode)
     }
     
-    func action(level: Int)->SKAction?{
+    func action(level: Int) {
 
         let linePath = UIBezierPath()
         linePath.move(to: CGPoint(x: 0, y: 0))
@@ -187,7 +193,7 @@ class Fighter: SKSpriteNode, enemy, enemyWatchDelegate {
                 action
             ]);
         
-        return seq
+        return
     }
     
     //enemy prototype funcs
@@ -206,7 +212,7 @@ class Fighter: SKSpriteNode, enemy, enemyWatchDelegate {
             return;
         }
         if(sNode.name == "CriticalSpot"){
-            self.hit(point: CGPoint(x: 0, y: 0), damage: 3)
+            self.hit(point: CGPoint(x: 0, y: 0), damage: 5)
         }
     }
     
@@ -274,11 +280,11 @@ class LilBasterd: SKSpriteNode, enemy, enemyWatchDelegate {
             return;
         }
         if(sNode.name == "CriticalSpot"){
-            self.hit(point: CGPoint(x: 0, y: 0), damage: 3)
+            self.hit(point: CGPoint(x: 0, y: 0), damage: 5)
         }
     }
     
-    func action(level: Int)->SKAction?{
+    func action(level: Int) {
         let linePath = UIBezierPath()
         linePath.move(to: CGPoint(x: 0, y: 0))
         linePath.addLine(to: CGPoint(x: 0, y: -3000))
@@ -316,7 +322,6 @@ class LilBasterd: SKSpriteNode, enemy, enemyWatchDelegate {
             fireLoop
             ]);
         
-        return seq
     }
     
     func destroy() {
@@ -380,12 +385,11 @@ class Bullet: SKSpriteNode, enemy, enemyWatchDelegate {
             return;
         }
         if(sNode.name == "CriticalSpot"){
-            self.hit(point: CGPoint(x: 0, y: 0), damage: 3)
+            self.hit(point: CGPoint(x: 0, y: 0), damage: 5)
         }
     }
     
-    func action(level: Int) -> SKAction? {
-        return nil
+    func action(level: Int) {
     }
     
     func destroy() {
@@ -408,6 +412,87 @@ class Bullet: SKSpriteNode, enemy, enemyWatchDelegate {
     }
 }
 
+class Carrier: SKSpriteNode, enemy, enemyWatchDelegate {
+    var eventWatch: enemyWatchDelegate?
+    let baseHP:Int = 50
+    var hp: Int = 0
+    var spawner: EnemyGenerator = EnemyGenerator(position: CGPoint(x: 0, y: 0), horizontalRange: 0);
+    
+    override init(texture: SKTexture!, color: SKColor, size: CGSize) {
+        super.init(texture: texture, color: color, size: size)
+        spawner.position = CGPoint(x: -self.size.width/2, y: 0);
+        spawner.domain = self.size.width;
+        spawner.range = -3000;
+        spawner.paths = [CGPath]();
+        spawner.initPaths();
+        spawner.loadLevel("carrier");
+        self.addChild(spawner);
+    }
+    
+    convenience init(position: CGPoint, size: CGSize, delegate: enemyWatchDelegate?) {
+        self.init(texture:nil, color: UIColor.gray, size: size)
+        self.name = "Carrier"
+        self.eventWatch = delegate
+        self.hp = baseHP
+        
+        //body
+        self.position = position
+        self.physicsBody = SKPhysicsBody(rectangleOf: size);
+        self.physicsBody?.isDynamic = false
+        
+        self.physicsBody?.collisionBitMask = 0
+        self.physicsBody?.categoryBitMask = BitMasksEnum.HIT_CONTACT_BM
+        
+        //Crit Spot
+        let critSpot = CriticalSpot(position: CGPoint(x: 0, y: size.height/2), size: CGSize(width: 50, height: 50), delegate: self)
+        self.addChild(critSpot as SKSpriteNode)
+    }
+    
+    //respond to criticalSpot child
+    func didDestroyEnemy(node: enemy) {
+        guard let sNode = node as? SKSpriteNode else {
+            return;
+        }
+        if(sNode.name == "CriticalSpot"){
+            self.hit(point: CGPoint(x: 0, y: 0), damage: 3)
+        }
+    }
+    
+    func action(level: Int) {
+        spawner.spawnLevel();
+    }
+    
+    //enemy prototype funcs
+    func hit(point: CGPoint, damage: Int){
+        if(self.hp > 0 ){
+            self.hp -= damage
+            if(hp <= 0){
+                self.destroy()
+            }
+        }
+    }
+    
+    func destroy() {
+        self.isHidden = true
+        self.hp = 0
+        self.spawner.removeAllActions();
+        self.spawner.removeAllChildren();
+        self.removeAllActions()
+        eventWatch?.didDestroyEnemy(node: self)
+        
+        mainScene?.enemyDestroyed(node: self, points: 1000)
+    }
+    
+    func reset() {
+        self.removeAllActions()
+        self.isHidden = true
+        self.hp = baseHP
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+}
 
 
 

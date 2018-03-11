@@ -25,11 +25,15 @@ protocol enemy {
     func hit(point: CGPoint, damage: Int)
     func destroy()
     func reset()
-    func action(level: Int)->SKAction?
+    func action(level: Int);
 }
 
 protocol enemyWatchDelegate {
     func didDestroyEnemy(node: enemy)
+}
+
+protocol gameEventDelegate {
+    func didPowerUp(type: Int);
 }
 
 class GameScene: SKScene, SKPhysicsContactDelegate {
@@ -60,6 +64,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var spawner: EnemyGenerator?
     var lastSpawned: TimeInterval = 0
     var spawnDelay: TimeInterval = 0
+    var checkSpawn: Bool = true
 
     override init(size: CGSize) {
         super.init(size: CGSize(width: size.width, height: size.height))
@@ -75,7 +80,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     override func sceneDidLoad() {
         //default crap
         self.lastUpdateTime = 0
-        screenSize = getVisibleScreen(sceneWidth: self.frame.width, sceneHeight: self.frame.height, viewWidth: UIScreen.main.bounds.width, viewHeight: UIScreen.main.bounds.height)
+        screenSize = Util.getVisibleScreen(sceneWidth: self.frame.width, sceneHeight: self.frame.height, viewWidth: UIScreen.main.bounds.width, viewHeight: UIScreen.main.bounds.height)
         
         //Camera
         //Move camera such that anchor is center bottom screen
@@ -102,15 +107,15 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         self.UIOverlay.addChild(bottomBar)
         
         //turret
-        turret = Turret(scene: self, size: CGSize(width: 200, height: 200))
-        turret?.position = CGPoint(x: 200, y: 100)
-        UIOverlay.addChild(turret!)
-        turrets.append(turret!)
-        
-        let turret2 = Turret(scene: self, size: CGSize(width: 200, height: 200))
-        turret2.position = CGPoint(x: -200, y: 100)
-        UIOverlay.addChild(turret2)
-        turrets.append(turret2)
+//        turret = Turret(scene: self, size: CGSize(width: 200, height: 200))
+//        turret?.position = CGPoint(x: 200, y: 100)
+//        UIOverlay.addChild(turret!)
+//        turrets.append(turret!)
+//
+//        let turret2 = Turret(scene: self, size: CGSize(width: 200, height: 200))
+//        turret2.position = CGPoint(x: -200, y: 100)
+//        UIOverlay.addChild(turret2)
+//        turrets.append(turret2)
         
         let turret3 = Turret(scene: self, size: CGSize(width: 200, height: 200))
         turret3.position = CGPoint(x: 0, y: 100)
@@ -118,7 +123,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         turrets.append(turret3)
         
         //spawner
+        let lvlName:String = "level_" + String(level);
         self.spawner = EnemyGenerator(position: CGPoint(x: -w/2, y: h), horizontalRange: w);
+        self.spawner?.loadLevel(lvlName);
+        self.spawner?.initPaths();
         self.addChild(spawner!);
         
         //toggle weapon
@@ -145,37 +153,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
         
     }
-
     
-    func getVisibleScreen( sceneWidth: CGFloat, sceneHeight: CGFloat, viewWidth: CGFloat, viewHeight: CGFloat) -> CGRect {
-        var sceneWidth = sceneWidth
-        var sceneHeight = sceneHeight
-        var x: CGFloat = 0
-        var y: CGFloat = 0
-        
-        let deviceAspectRatio = viewWidth/viewHeight
-        let sceneAspectRatio = sceneWidth/sceneHeight
-        
-        if deviceAspectRatio < sceneAspectRatio {
-            let newSceneWidth: CGFloat = (sceneWidth * viewHeight) / sceneHeight
-            let sceneWidthDifference: CGFloat = (newSceneWidth - viewWidth)/2
-            let diffPercentageWidth: CGFloat = sceneWidthDifference / (newSceneWidth)
-            
-            x = diffPercentageWidth * sceneWidth
-            sceneWidth = sceneWidth - (diffPercentageWidth * 2 * sceneWidth)
-        } else {
-            let newSceneHeight: CGFloat = (sceneHeight * viewWidth) / sceneWidth
-            let sceneHeightDifference: CGFloat = (newSceneHeight - viewHeight)/2
-            let diffPercentageHeight: CGFloat = fabs(sceneHeightDifference / (newSceneHeight))
-            
-            y = diffPercentageHeight * sceneHeight
-            sceneHeight = sceneHeight - (diffPercentageHeight * 2 * sceneHeight)
-        }
-        
-        let visibleScreenOffset = CGRect(x: CGFloat(x), y: CGFloat(y), width: CGFloat(sceneWidth), height: CGFloat(sceneHeight))
-        return visibleScreenOffset
-    }
-    
+    //TOUCH COMANDS
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesBegan(touches, with: event)
         for touch in touches{
@@ -208,8 +187,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             }
         } else {
             let touchedNode = UIOverlay.atPoint(point)
-            if(touchedNode.name == "toggleWeaponButton"){
-                turret?.toggleWeapon()
+            if(touchedNode.name == "Turret"){
+                let tur = touchedNode as! Turret
+                tur.toggleWeapon();
             }
         }
     }
@@ -227,25 +207,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
     }
     
-    func SDistanceBetweenPoints(first: CGPoint, second: CGPoint)->CGFloat{
-        return CGFloat(hypotf(Float(second.x - first.x), Float(second.y - first.y)));
-    }
-    
+
     func fire(){
-//        if let touch = self.touchNode {
-//            var theta:CGFloat = 0;
-//            theta = atan( ( touch.position.x - turret!.position.x ) / (touch.position.y - turret!.position.y ) ) * -1
-//                if(touch.position.y <= self.turret!.position.y){
-//                    theta = CGFloat.pi/2;
-//                    if(touch.position.x > 0){
-//                        theta = theta * -1
-//                    }
-//                }
-//
-//            self.turret?.zRotation = theta
-//            self.turret?.activeWeapon?.fire(theta: theta)
-//        }
-        
         if let touch = self.touchNode {
             for tur in turrets {
                 var theta:CGFloat = 0;
@@ -264,6 +227,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     
+    //DELEGATES
     func didBegin(_ contact: SKPhysicsContact) {
         if let enemy =  contact.bodyA.node as? enemy {
             enemy.destroy()
@@ -283,36 +247,57 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     func upgradeWeapon(){
-        let pick = arc4random_uniform(2)
-        let type = arc4random_uniform(5)
-        if(pick == 0){
-            return
-        } else {
-            return
-        }
-        
-    }
 
+    }
+    
     //update funcs
     override func update(_ currentTime: TimeInterval) {
         self.lastUpdateTime = currentTime
         let dtSpawn = currentTime - lastSpawned
         
         //spawn
-        if(dtSpawn >= spawnDelay){
+        if(checkSpawn && dtSpawn >= spawnDelay){
+            checkSpawn = false;
+            self.lastSpawned = currentTime
+            
             let nextDelay = spawner!.spawnWave();
+            
             if(nextDelay > 0.0){
-                self.lastSpawned = currentTime
                 self.spawnDelay = nextDelay;
-            } else { //end of level
-                self.isPaused = true;
+                checkSpawn = true;
+            } else { //end of level, go to next
+                level += 1;
+                let didLoad = spawner!.loadLevel("level_"+String(level));
+                if(didLoad){
+                    let label = SKLabelNode(text: "LEVEL " + String(level));
+                    label.fontSize = 90;
+                    label.fontColor = UIColor.yellow;
+                    label.position = CGPoint(x: 0, y: screenSize!.height - 400)
+                    self.UIOverlay.addChild(label);
+                    
+                    self.run(SKAction.sequence([
+                        SKAction.wait(forDuration: 3.0),
+                        SKAction.run({
+                            label.removeFromParent();
+                        })
+                    ]));
+                    
+                    self.lastSpawned = currentTime;
+                    self.spawnDelay = 3.5;
+                    checkSpawn = true;
+                } else {
+                    let label = SKLabelNode(text: "Victory!");
+                    label.fontSize = 90;
+                    label.fontColor = UIColor.yellow;
+                    label.position = CGPoint(x: 0, y: screenSize!.height - 400)
+                    self.UIOverlay.addChild(label);
+                }
             }
         }
         
         if(touchNode?.isHidden == false){
             fire()
         }
-
         
     }
     
@@ -320,7 +305,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         for tur in turrets {
             tur.activeWeapon?.deltaFramesLastFired+=1
         }
-//        self.turret?.activeWeapon?.deltaFramesLastFired+=1
     }
 }
 

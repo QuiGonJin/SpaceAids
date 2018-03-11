@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E21A793C2054FBA4006E9BFD /* Util.swift in Sources */ = {isa = PBXBuildFile; fileRef = E21A793B2054FBA4006E9BFD /* Util.swift */; };
 		E26BB8DB2009E07C00B5A4B7 /* PathBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = E26BB8DA2009E07C00B5A4B7 /* PathBuilder.swift */; };
 		E26BB8DD200DC85F00B5A4B7 /* SpriteCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = E26BB8DC200DC85F00B5A4B7 /* SpriteCollection.swift */; };
 		E26BB8DF200F19E100B5A4B7 /* Spawner.swift in Sources */ = {isa = PBXBuildFile; fileRef = E26BB8DE200F19E100B5A4B7 /* Spawner.swift */; };
@@ -25,6 +26,8 @@
 		E2AFC15F202190560045725A /* Weapon.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2AFC15E202190560045725A /* Weapon.swift */; };
 		E2CE1D1D204684B700C7C7E8 /* EnemyGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2CE1D1C204684B700C7C7E8 /* EnemyGenerator.swift */; };
 		E2CE1D202047DC8500C7C7E8 /* level_1.csv in Resources */ = {isa = PBXBuildFile; fileRef = E2CE1D1F2047DC8500C7C7E8 /* level_1.csv */; };
+		E2CE1D2220510F1000C7C7E8 /* carrier.csv in Resources */ = {isa = PBXBuildFile; fileRef = E2CE1D2120510F1000C7C7E8 /* carrier.csv */; };
+		E2CE1D242054F0AA00C7C7E8 /* level_2.csv in Resources */ = {isa = PBXBuildFile; fileRef = E2CE1D232054F0AA00C7C7E8 /* level_2.csv */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -45,6 +48,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		E21A793B2054FBA4006E9BFD /* Util.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Util.swift; sourceTree = "<group>"; };
 		E26BB8DA2009E07C00B5A4B7 /* PathBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PathBuilder.swift; sourceTree = "<group>"; };
 		E26BB8DC200DC85F00B5A4B7 /* SpriteCollection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpriteCollection.swift; sourceTree = "<group>"; };
 		E26BB8DE200F19E100B5A4B7 /* Spawner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Spawner.swift; sourceTree = "<group>"; };
@@ -69,6 +73,8 @@
 		E2AFC15E202190560045725A /* Weapon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Weapon.swift; sourceTree = "<group>"; };
 		E2CE1D1C204684B700C7C7E8 /* EnemyGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnemyGenerator.swift; sourceTree = "<group>"; };
 		E2CE1D1F2047DC8500C7C7E8 /* level_1.csv */ = {isa = PBXFileReference; lastKnownFileType = text; path = level_1.csv; sourceTree = "<group>"; };
+		E2CE1D2120510F1000C7C7E8 /* carrier.csv */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = carrier.csv; sourceTree = "<group>"; };
+		E2CE1D232054F0AA00C7C7E8 /* level_2.csv */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = level_2.csv; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -136,6 +142,7 @@
 				E2AFC15C20143AAB0045725A /* Enemy.swift */,
 				E2AFC15E202190560045725A /* Weapon.swift */,
 				E2CE1D1C204684B700C7C7E8 /* EnemyGenerator.swift */,
+				E21A793B2054FBA4006E9BFD /* Util.swift */,
 			);
 			path = SpaceAids;
 			sourceTree = "<group>";
@@ -162,6 +169,8 @@
 			isa = PBXGroup;
 			children = (
 				E2CE1D1F2047DC8500C7C7E8 /* level_1.csv */,
+				E2CE1D2120510F1000C7C7E8 /* carrier.csv */,
+				E2CE1D232054F0AA00C7C7E8 /* level_2.csv */,
 			);
 			path = levels;
 			sourceTree = "<group>";
@@ -278,6 +287,8 @@
 				E29C16B720033247002BAAF2 /* GameScene.sks in Resources */,
 				E29C16C220033247002BAAF2 /* Assets.xcassets in Resources */,
 				E29C16C520033247002BAAF2 /* LaunchScreen.storyboard in Resources */,
+				E2CE1D2220510F1000C7C7E8 /* carrier.csv in Resources */,
+				E2CE1D242054F0AA00C7C7E8 /* level_2.csv in Resources */,
 				E29C16B920033247002BAAF2 /* Actions.sks in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -303,6 +314,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E21A793C2054FBA4006E9BFD /* Util.swift in Sources */,
 				E26BB8DF200F19E100B5A4B7 /* Spawner.swift in Sources */,
 				E2AFC15D20143AAB0045725A /* Enemy.swift in Sources */,
 				E2CE1D1D204684B700C7C7E8 /* EnemyGenerator.swift in Sources */,
