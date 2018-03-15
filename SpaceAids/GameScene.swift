@@ -25,7 +25,8 @@ protocol enemy {
     func hit(point: CGPoint, damage: Int)
     func destroy()
     func reset()
-    func action(level: Int);
+    func action(level: Int)
+    func suicide()->Int
 }
 
 protocol enemyWatchDelegate {
@@ -37,26 +38,28 @@ protocol gameEventDelegate {
 }
 
 class GameScene: SKScene, SKPhysicsContactDelegate {
-    //Default
+    //scene
     var lastUpdateTime : TimeInterval = 0
     let displaySize: CGRect = UIScreen.main.bounds
     var screenSize: CGRect?
 
+    //UI
     var UIOverlay: SKNode = SKNode();
     var turrets : [Turret] = [Turret]();
     var turret : Turret?
     var toggleWeaponButton: SKSpriteNode?
-    var scoreLabel: SKLabelNode?
+    var scoreLabel: SKLabelNode = SKLabelNode();
+    var healthLabel: SKLabelNode = SKLabelNode();
     var touchNode : SKSpriteNode?
+    
+    //Particles
+    var ParticleOverlay: SKNode = SKNode();
     
     //player
     var health: Int = 100
+    var maxHealth: Int = 150
     var level: Int = 1
     var score: Int = 0
-
-    var rifle: weapon?
-    var magnum: weapon?
-    var weaponIndex = 0;
     var cam: SKCameraNode?
     
     //enemies
@@ -92,8 +95,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         let w = (screenSize?.width)!
         let h = (screenSize?.height)!
         self.UIOverlay.position = CGPoint(x: 0, y: 0)
-        self.UIOverlay.zPosition = 10
+        self.UIOverlay.zPosition = 3
         self.addChild(UIOverlay)
+        
+        //ParticalOverlay
+        self.ParticleOverlay.position = CGPoint(x: 0, y: 0)
+        self.ParticleOverlay.zPosition = 2
+        self.addChild(ParticleOverlay)
         
         let bottomBar = SKSpriteNode(texture: nil, color: UIColor.gray, size: CGSize(width: (self.screenSize?.width)!, height: 200))
         bottomBar.position = CGPoint(x: 0, y: 100)
@@ -134,14 +142,22 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         toggleWeaponButton?.name = "toggleWeaponButton"
         UIOverlay.addChild(toggleWeaponButton!)
         
-        //score label
+        //labels
         scoreLabel = SKLabelNode()
-        scoreLabel?.text = String(self.score)
-        scoreLabel?.fontSize = 72
-        scoreLabel?.position = CGPoint(x: 0, y: h - 200)
-        scoreLabel?.name = "scorelabel"
-        UIOverlay.addChild(scoreLabel!)
+        scoreLabel.text = String(self.score)
+        scoreLabel.fontName = "HelveticaNeue"
+        scoreLabel.fontSize = 72
+        scoreLabel.position = CGPoint(x: 0, y: h - 200)
+        scoreLabel.name = "scorelabel"
+        UIOverlay.addChild(scoreLabel)
         
+        healthLabel = SKLabelNode()
+        healthLabel.text = String(health)
+        healthLabel.fontSize = 60
+        healthLabel.fontName = "HelveticaNeue"
+        healthLabel.position = CGPoint(x: 0, y: 50)
+        healthLabel.name = "healthLabel"
+        UIOverlay.addChild(healthLabel)
         
         //Controls
         self.touchNode = SKSpriteNode(color: UIColor.blue, size: CGSize(width: 50, height: 50))
@@ -224,23 +240,74 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
     }
     
+    //Particles
+    
+    func createTextParticle(text: String, position: CGPoint?, duration: Double = 0.5, fontSize: CGFloat = 60){
+        let label = SKLabelNode(text: text);
+        label.fontSize = fontSize;
+        label.fontName = "HelveticaNeue";
+        label.fontColor = UIColor.yellow;
+        if let pos = position {
+            label.position = pos;
+        } else {
+            label.position = CGPoint(x: 0, y: screenSize!.height - 400)
+        }
+
+        self.ParticleOverlay.addChild(label);
+        
+        ParticleOverlay.run(SKAction.sequence([
+            SKAction.wait(forDuration: duration),
+            SKAction.run({
+                label.removeFromParent();
+            })
+        ]));
+    }
+    
     
     //DELEGATES
     func didBegin(_ contact: SKPhysicsContact) {
         if let enemy =  contact.bodyA.node as? enemy {
-            enemy.destroy()
+            didTakeDmg(enemy.suicide())
         } else if let enemy = contact.bodyB.node as? enemy{
-            enemy.destroy()
+            didTakeDmg(enemy.suicide())
         }
+    }
+    
+    func didTakeDmg(_ dmg: Int){
+        self.health = self.health - dmg;
+        self.healthLabel.text = String(self.health)
     }
     
     func enemyDestroyed(node: SKNode, points: Int){
         self.score += points;
-        self.scoreLabel?.text = String(score);
+        self.scoreLabel.text = String(score);
+        
+        //lifesteal
+        let bonus: Int = points / 10;
+        if(bonus + health < maxHealth){
+            health += bonus;
+        } else {
+            health = maxHealth
+        }
+        self.healthLabel.text = String(health);
+        
+        let p = node.position;
+        let posIn = node.parent?.convert(node.position, to: ParticleOverlay);
+//        print(posIn);
+//        createTextParticle(text: "+"+String(points), position: posIn)
     }
     
     func powerUp(type: Int){
-        print("power up " + String(type));
+        if(type == 0){
+            for tur in turrets {
+                tur.upgradeRoF();
+            }
+        } else if (type == 1){
+            for tur in turrets {
+                tur.upgradeDmg();
+            }
+        }
+        
     }
     
     //update funcs
@@ -262,18 +329,20 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 level += 1;
                 let didLoad = spawner!.loadLevel("level_"+String(level));
                 if(didLoad){
-                    let label = SKLabelNode(text: "LEVEL " + String(level));
-                    label.fontSize = 90;
-                    label.fontColor = UIColor.yellow;
-                    label.position = CGPoint(x: 0, y: screenSize!.height - 400)
-                    self.UIOverlay.addChild(label);
                     
-                    self.run(SKAction.sequence([
-                        SKAction.wait(forDuration: 3.0),
-                        SKAction.run({
-                            label.removeFromParent();
-                        })
-                    ]));
+                    createTextParticle(text: "LEVEL "+String(level), position: nil, duration: 3.0, fontSize: 90)
+//                    let label = SKLabelNode(text: "LEVEL " + String(level));
+//                    label.fontSize = 90;
+//                    label.fontColor = UIColor.yellow;
+//                    label.position = CGPoint(x: 0, y: screenSize!.height - 400)
+//                    self.UIOverlay.addChild(label);
+//
+//                    self.run(SKAction.sequence([
+//                        SKAction.wait(forDuration: 3.0),
+//                        SKAction.run({
+//                            label.removeFromParent();
+//                        })
+//                    ]));
                     
                     self.lastSpawned = currentTime;
                     self.spawnDelay = 3.5;

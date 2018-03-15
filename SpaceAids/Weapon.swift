@@ -21,6 +21,8 @@ protocol weapon {
     func reload()
     func activate()
     func deactivate()
+    func upgradeDmg()
+    func upgradeRoF()
 }
 
 class Turret: SKSpriteNode {
@@ -45,6 +47,18 @@ class Turret: SKSpriteNode {
         activeWeapon?.ready = true
     }
     
+    func upgradeDmg(){
+        for wep in weapons {
+            wep.upgradeDmg();
+        }
+    }
+    
+    func upgradeRoF(){
+        for wep in weapons {
+            wep.upgradeRoF();
+        }
+    }
+    
     func toggleWeapon(){
         weaponIndex += 1
         if(weaponIndex >= weapons.count){
@@ -65,7 +79,7 @@ class Rifle: weapon {
     var turret: SKNode
     var projectileSprites: SpriteCollection
     var deltaFramesLastFired = 10
-    var ROF:CGFloat = 8.33
+    var ROF:CGFloat = 12
     var damage:Int = 10
     var ammo: Int = 0
     var magazineSize: Int = 30
@@ -73,6 +87,10 @@ class Rifle: weapon {
     var ready: Bool = false
     var readyDelay: TimeInterval = 1.0
     var reloadDelay: TimeInterval = 1.4
+    var ROF_level:Double = 0;
+    let e = 2.71828;
+    let t = -0.008;
+    
     init(scene: GameScene, turret: SKNode){
         self.SCAN_LENGTH = sqrt(pow(scene.frame.height, 2) + pow(scene.frame.width/2, 2))
         self.scene = scene
@@ -123,6 +141,18 @@ class Rifle: weapon {
         }
     }
 
+    func upgradeDmg() {
+        self.damage += 1;
+//        print("Rifle dmg: ", self.damage);
+    }
+    
+    func upgradeRoF() {
+        ROF_level += 1;
+        let p = pow(e, t*ROF_level);
+        ROF = ROF * CGFloat(p);
+//        print("RIFLE ROF ", ROF_level, " : ", ROF);
+    }
+    
     //Hitscan Sprites are rendered backwards, starting from target back to their source
     func renderHitscan(angle: CGFloat, start: CGPoint, end: CGPoint){
         let HSSprite = self.projectileSprites.getNext()
@@ -196,6 +226,10 @@ class Magnum: weapon {
     var turret: SKNode
     var ammo = 0
     var magazineSize = 6
+    var ROF_level:Double = 0;
+    let e = 2.71828;
+    let t = -0.001;
+    
     
     init(scene: GameScene, turret: SKNode){
         self.SCAN_LENGTH = sqrt(pow(scene.frame.height, 2) + pow(scene.frame.width/2, 2))
@@ -241,6 +275,18 @@ class Magnum: weapon {
             self.ready = true
             self.ammo = self.magazineSize
         }
+    }
+    
+    func upgradeDmg() {
+        self.damage += 2;
+//        print("Magnum dmg: ", self.damage);
+    }
+    
+    func upgradeRoF() {
+        ROF_level += 1;
+        let p = pow(e, t*ROF_level);
+        ROF = ROF * CGFloat(p);
+//        print("MAGNUM ROF: ", ROF);
     }
     
     //Hitscan Sprites are rendered backwards, starting from target back to their source

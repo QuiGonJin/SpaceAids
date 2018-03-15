@@ -57,19 +57,25 @@ class EnemyGenerator: SKNode, enemyWatchDelegate {
     
     func didDestroyEnemy(node: enemy, param: String?) {
         let n = node as! SKNode;
+        let p = n.position;
+        
         n.removeAllActions();
         n.removeFromParent();
-        
         guard let msg = param else {
+            n.removeAllActions();
+            n.removeFromParent();
             return;
         }
         let params: [String] = msg.components(separatedBy: ",");
         let type = params[0];
         if(type == "crit"){
-            return;
+
         } else if(type == "dead") {
             mainScene?.enemyDestroyed(node: self, points: Int(params[1])!)
-            return;
+            let f = self.convert(p, to: mainScene!.ParticleOverlay);
+            print(f);
+            mainScene?.createTextParticle(text: "+"+params[1], position: f)
+
         } else if(type == "power"){
             mainScene?.powerUp(type: Int(params[1])!);
         }
@@ -164,6 +170,17 @@ class EnemyGenerator: SKNode, enemyWatchDelegate {
         loop1.addLine(to: CGPoint(x: lstartX, y: -range))
         paths.append(loop1.cgPath)
         
+        //9 - boss loop
+        let bossLoop = UIBezierPath()
+        bossLoop.move(to: CGPoint(x: domain/2, y: 0))
+        bossLoop.addLine(to: CGPoint(x: domain/2, y: -range/3));
+        bossLoop.addLine(to: CGPoint(x: domain - 200, y: -range/2));
+        bossLoop.addLine(to: CGPoint(x: 200, y: -range/2));
+        bossLoop.addLine(to: CGPoint(x: domain/2, y: -range/3));
+        bossLoop.addLine(to: CGPoint(x: domain/2, y: -range));
+        paths.append(bossLoop.cgPath);
+        
+        
         //crayz loop
 //        let czStart = domain - 100
 //        var loopStart = CGPoint(x: lstartX, y: -(range/3));
@@ -200,9 +217,14 @@ class EnemyGenerator: SKNode, enemyWatchDelegate {
         linePath.move(to: CGPoint(x: 100, y: 0))
         linePath.addLine(to: CGPoint(x: 100, y: range))
         
+        var OTP = true;
+        
+        if (type == enemyTypeEnum.CARRIER){
+            OTP = false;
+        }
         
         for i in 0..<sprites.count {
-            let action = SKAction.follow(path, asOffset: true, orientToPath: true, speed: speed)
+            let action = SKAction.follow(path, asOffset: true, orientToPath: OTP, speed: speed)
             let mySprite = sprites[i];
             
             var e = sprites[i] as! enemy;
@@ -283,9 +305,9 @@ class EnemyGenerator: SKNode, enemyWatchDelegate {
             }
             return ret;
         }
-        if(type == 10){
+        if(type == enemyTypeEnum.CARRIER){
             for _ in 0..<count {
-                let sprite = Carrier(position: CGPoint(x: 0, y: 0), size: CGSize(width: 300, height: 300), delegate: self);
+                let sprite = Carrier(position: CGPoint(x: 0, y: 0), size: CGSize(width: 250, height: 250), delegate: self);
                 sprite.isHidden = true;
                 ret.append(sprite);
             }
