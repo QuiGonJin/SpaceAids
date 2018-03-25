@@ -23,6 +23,7 @@ protocol weapon {
     func deactivate()
     func upgradeDmg()
     func upgradeRoF()
+    func reset()
 }
 
 class Turret: SKSpriteNode {
@@ -30,6 +31,8 @@ class Turret: SKSpriteNode {
     var weaponIndex = 0
     var weapons:[weapon] = [weapon]()
     var myScene: GameScene?
+    var charge = true;
+    var chargeNotActive = true;
     
     override init(texture: SKTexture!, color: SKColor, size: CGSize) {
         super.init(texture: nil, color: color, size: size)
@@ -47,6 +50,12 @@ class Turret: SKSpriteNode {
         activeWeapon?.ready = true
     }
     
+    func reset(){
+        for wep in weapons {
+            wep.reset();
+        }
+    }
+    
     func upgradeDmg(){
         for wep in weapons {
             wep.upgradeDmg();
@@ -56,6 +65,32 @@ class Turret: SKSpriteNode {
     func upgradeRoF(){
         for wep in weapons {
             wep.upgradeRoF();
+        }
+    }
+    
+    func supercharge() {
+        self.charge = true;
+        self.color = UIColor.yellow;
+    }
+    
+    func activateSupercharge(){
+        if(self.charge && self.chargeNotActive){
+
+            self.charge = false;
+            self.chargeNotActive = false;
+            self.color = UIColor.blue;
+            
+            let seq = SKAction.sequence([
+                SKAction.run({
+                    self.toggleWeapon();
+                }),
+                SKAction.wait(forDuration: 6.0),
+                SKAction.run({
+                    self.toggleWeapon();
+                    self.chargeNotActive = true;
+                })
+            ]);
+            self.run(seq);
         }
     }
     
@@ -79,8 +114,8 @@ class Rifle: weapon {
     var turret: SKNode
     var projectileSprites: SpriteCollection
     var deltaFramesLastFired = 10
-    var ROF:CGFloat = 12
-    var damage:Int = 10
+    var ROF:CGFloat = 16
+    var damage:Int = 1
     var ammo: Int = 0
     var magazineSize: Int = 30
     var SCAN_LENGTH:CGFloat = 3000
@@ -89,7 +124,7 @@ class Rifle: weapon {
     var reloadDelay: TimeInterval = 1.4
     var ROF_level:Double = 0;
     let e = 2.71828;
-    let t = -0.008;
+    let t = -0.01;
     
     init(scene: GameScene, turret: SKNode){
         self.SCAN_LENGTH = sqrt(pow(scene.frame.height, 2) + pow(scene.frame.width/2, 2))
@@ -111,24 +146,24 @@ class Rifle: weapon {
         }
         
         projectileSprites = SpriteCollection(collection:hitscanSprites)
-    }
-    
-    func activate() {
         for i in 0..<projectileSprites.spriteCollection.count {
             self.scene.addChild(projectileSprites.spriteCollection[i])
         }
-        
+    }
+    
+    func activate() {
         self.ammo = self.magazineSize
-        DispatchQueue.main.asyncAfter(deadline: .now() + readyDelay) {
-            self.ready = true
-        }
+        self.ready = true
     }
     
     func deactivate() {
-        for i in 0..<projectileSprites.spriteCollection.count {
-            projectileSprites.spriteCollection[i].removeFromParent()
-        }
         self.ready = false
+    }
+    
+    func reset() {
+        ROF = 16
+        damage = 1
+        ROF_level = 0;
     }
     
     func reload() {
@@ -143,14 +178,12 @@ class Rifle: weapon {
 
     func upgradeDmg() {
         self.damage += 1;
-//        print("Rifle dmg: ", self.damage);
     }
     
     func upgradeRoF() {
         ROF_level += 1;
         let p = pow(e, t*ROF_level);
         ROF = ROF * CGFloat(p);
-//        print("RIFLE ROF ", ROF_level, " : ", ROF);
     }
     
     //Hitscan Sprites are rendered backwards, starting from target back to their source
@@ -203,7 +236,6 @@ class Rifle: weapon {
                     let farEndPoint = CGPoint(x: -SCAN_LENGTH*sin(theta) + self.turret.position.x,
                                               y: SCAN_LENGTH*cos(theta) + self.turret.position.y)
                     self.hitscan(angleFromYAxis: theta, start: startPos, end: farEndPoint)
-//                    self.ammo -= 1
                 }
             } else {
                 reload()
@@ -215,20 +247,20 @@ class Rifle: weapon {
 
 class Magnum: weapon {
     var scene:GameScene
+    var turret: SKNode
     var projectileSprites: SpriteCollection
-    var deltaFramesLastFired = 100
-    var ROF:CGFloat = 30
-    var damage:Int = 6
+    var deltaFramesLastFired = 10
+    var ROF:CGFloat = 9
+    var damage:Int = 1
+    var ammo: Int = 0
+    var magazineSize: Int = 30
     var SCAN_LENGTH:CGFloat = 3000
     var ready: Bool = false
-    var readyDelay: TimeInterval = 0.4
-    var reloadDelay: TimeInterval = 1.8
-    var turret: SKNode
-    var ammo = 0
-    var magazineSize = 6
+    var readyDelay: TimeInterval = 1.0
+    var reloadDelay: TimeInterval = 1.4
     var ROF_level:Double = 0;
     let e = 2.71828;
-    let t = -0.001;
+    let t = -0.01;
     
     
     init(scene: GameScene, turret: SKNode){
@@ -247,24 +279,25 @@ class Magnum: weapon {
         hitscanSprites.append(HS3)
         
         projectileSprites = SpriteCollection(collection:hitscanSprites)
+        for i in 0..<projectileSprites.spriteCollection.count {
+            self.scene.addChild(projectileSprites.spriteCollection[i])
+        }
     }
 
     
     func activate() {
-        for i in 0..<projectileSprites.spriteCollection.count {
-            self.scene.addChild(projectileSprites.spriteCollection[i])
-        }
-        
         self.ammo = self.magazineSize
-        DispatchQueue.main.asyncAfter(deadline: .now() + readyDelay) {
-            self.ready = true
-        }
+        self.ready = true
     }
     
     func deactivate() {
-        for i in 0..<projectileSprites.spriteCollection.count {
-            projectileSprites.spriteCollection[i].removeFromParent()
-        }
+        self.ready = false;
+    }
+    
+    func reset() {
+        ROF = 9
+        damage = 1
+        ROF_level = 0;
     }
     
     func reload() {
@@ -278,15 +311,13 @@ class Magnum: weapon {
     }
     
     func upgradeDmg() {
-        self.damage += 2;
-//        print("Magnum dmg: ", self.damage);
+        self.damage += 1;
     }
     
     func upgradeRoF() {
         ROF_level += 1;
         let p = pow(e, t*ROF_level);
         ROF = ROF * CGFloat(p);
-//        print("MAGNUM ROF: ", ROF);
     }
     
     //Hitscan Sprites are rendered backwards, starting from target back to their source
@@ -330,7 +361,6 @@ class Magnum: weapon {
                     let farEndPoint = CGPoint(x: -SCAN_LENGTH*sin(theta) + self.turret.position.x,
                                               y: SCAN_LENGTH*cos(theta) + self.turret.position.y)
                     self.hitscan(angleFromYAxis: theta, start: startPos, end: farEndPoint)
-//                    self.ammo -= 1
                 }
             } else {
                 reload()

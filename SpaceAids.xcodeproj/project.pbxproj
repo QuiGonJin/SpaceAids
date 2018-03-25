@@ -11,6 +11,8 @@
 		E26BB8DB2009E07C00B5A4B7 /* PathBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = E26BB8DA2009E07C00B5A4B7 /* PathBuilder.swift */; };
 		E26BB8DD200DC85F00B5A4B7 /* SpriteCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = E26BB8DC200DC85F00B5A4B7 /* SpriteCollection.swift */; };
 		E26BB8DF200F19E100B5A4B7 /* Spawner.swift in Sources */ = {isa = PBXBuildFile; fileRef = E26BB8DE200F19E100B5A4B7 /* Spawner.swift */; };
+		E278F6792067819300298489 /* test.csv in Resources */ = {isa = PBXBuildFile; fileRef = E278F6782067819300298489 /* test.csv */; };
+		E278F67B2067844300298489 /* level_3.csv in Resources */ = {isa = PBXBuildFile; fileRef = E278F67A2067844300298489 /* level_3.csv */; };
 		E29C16B520033247002BAAF2 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E29C16B420033247002BAAF2 /* AppDelegate.swift */; };
 		E29C16B720033247002BAAF2 /* GameScene.sks in Resources */ = {isa = PBXBuildFile; fileRef = E29C16B620033247002BAAF2 /* GameScene.sks */; };
 		E29C16B920033247002BAAF2 /* Actions.sks in Resources */ = {isa = PBXBuildFile; fileRef = E29C16B820033247002BAAF2 /* Actions.sks */; };
@@ -52,6 +54,8 @@
 		E26BB8DA2009E07C00B5A4B7 /* PathBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PathBuilder.swift; sourceTree = "<group>"; };
 		E26BB8DC200DC85F00B5A4B7 /* SpriteCollection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpriteCollection.swift; sourceTree = "<group>"; };
 		E26BB8DE200F19E100B5A4B7 /* Spawner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Spawner.swift; sourceTree = "<group>"; };
+		E278F6782067819300298489 /* test.csv */ = {isa = PBXFileReference; lastKnownFileType = text; path = test.csv; sourceTree = "<group>"; };
+		E278F67A2067844300298489 /* level_3.csv */ = {isa = PBXFileReference; lastKnownFileType = text; path = level_3.csv; sourceTree = "<group>"; };
 		E29C16B120033247002BAAF2 /* SpaceAids.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SpaceAids.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E29C16B420033247002BAAF2 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		E29C16B620033247002BAAF2 /* GameScene.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = GameScene.sks; sourceTree = "<group>"; };
@@ -171,6 +175,8 @@
 				E2CE1D1F2047DC8500C7C7E8 /* level_1.csv */,
 				E2CE1D2120510F1000C7C7E8 /* carrier.csv */,
 				E2CE1D232054F0AA00C7C7E8 /* level_2.csv */,
+				E278F6782067819300298489 /* test.csv */,
+				E278F67A2067844300298489 /* level_3.csv */,
 			);
 			path = levels;
 			sourceTree = "<group>";
@@ -290,6 +296,8 @@
 				E2CE1D2220510F1000C7C7E8 /* carrier.csv in Resources */,
 				E2CE1D242054F0AA00C7C7E8 /* level_2.csv in Resources */,
 				E29C16B920033247002BAAF2 /* Actions.sks in Resources */,
+				E278F6792067819300298489 /* test.csv in Resources */,
+				E278F67B2067844300298489 /* level_3.csv in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

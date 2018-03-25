@@ -135,7 +135,7 @@ class SuicideBomber: SKSpriteNode, enemy, enemyWatchDelegate {
         self.isHidden = true
         self.hp = 0
         self.removeAllActions()
-        eventWatch?.didDestroyEnemy(node: self, param: "dead,0")
+        eventWatch?.didDestroyEnemy(node: self, param: "suicide,0")
         return 50
     }
     
@@ -218,7 +218,7 @@ class Fighter: SKSpriteNode, enemy, enemyWatchDelegate {
         self.isHidden = true
         self.hp = 0
         self.removeAllActions()
-        eventWatch?.didDestroyEnemy(node: self, param: "dead,0")
+        eventWatch?.didDestroyEnemy(node: self, param: "suicide,0")
         return 20
     }
     
@@ -301,7 +301,7 @@ class LilBasterd: SKSpriteNode, enemy, enemyWatchDelegate {
         self.isHidden = true
         self.hp = 0
         self.removeAllActions()
-        eventWatch?.didDestroyEnemy(node: self, param: "dead,0")
+        eventWatch?.didDestroyEnemy(node: self, param: "suicide,0")
         return 20
     }
     
@@ -373,7 +373,6 @@ class Bullet: SKSpriteNode, enemy, enemyWatchDelegate {
         self.hp = 0
         self.removeAllActions()
         eventWatch?.didDestroyEnemy(node: self, param: "dead,20")
-        
 //        mainScene?.enemyDestroyed(node: self, points: 10)
     }
     
@@ -381,7 +380,7 @@ class Bullet: SKSpriteNode, enemy, enemyWatchDelegate {
         self.isHidden = true
         self.hp = 0
         self.removeAllActions()
-        eventWatch?.didDestroyEnemy(node: self, param: "dead,0")
+        eventWatch?.didDestroyEnemy(node: self, param: "suicide,0")
         return 10
     }
     
@@ -399,17 +398,9 @@ class Carrier: SKSpriteNode, enemy, enemyWatchDelegate {
     var eventWatch: enemyWatchDelegate?
     let baseHP:Int = 50
     var hp: Int = 0
-    var spawner: EnemyGenerator = EnemyGenerator(position: CGPoint(x: 0, y: 0), horizontalRange: 0);
     
     override init(texture: SKTexture!, color: SKColor, size: CGSize) {
         super.init(texture: texture, color: color, size: size)
-        spawner.position = CGPoint(x: -self.size.width/2, y: 0);
-        spawner.domain = self.size.width;
-        spawner.range = 3000;
-        spawner.paths = [CGPath]();
-        spawner.initPaths();
-        spawner.loadLevel("carrier");
-        self.addChild(spawner);
     }
     
     convenience init(position: CGPoint, size: CGSize, delegate: enemyWatchDelegate?) {
@@ -445,8 +436,54 @@ class Carrier: SKSpriteNode, enemy, enemyWatchDelegate {
         }
     }
     
+    func carrierSpawn(count: Int, speed: Int){
+        if let msSpawn = mainScene?.spawner {
+            let linePath0 = UIBezierPath()
+            linePath0.move(to: CGPoint(x:0, y: 0))
+            linePath0.addLine(to: CGPoint(x: 0, y: -3000))
+            
+            let spawnDelay : Double = 0.300;
+            let mSprites = msSpawn.buildWave(type: 4, count: count);
+            
+            for i in 0..<mSprites.count {
+                let action = SKAction.follow(linePath0.cgPath, asOffset: true, orientToPath: true, speed: CGFloat(speed))
+                let mySprite = mSprites[i];
+                var e = mSprites[i] as! enemy;
+                e.hp = 1
+                
+                let group = SKAction.group([
+                    action,
+                    SKAction.run({
+                        mySprite.isHidden = false;
+                    })
+                    ])
+                
+                let sequence = SKAction.sequence([
+                    SKAction.wait(forDuration: spawnDelay * Double(i)),
+                    SKAction.run({
+                        mySprite.position = self.position;
+                        msSpawn.addChild(mySprite);
+                        mySprite.run(group);
+                    })
+                    ]);
+                self.run(sequence);
+            }
+        }
+    }
+    
     func action(level: Int) {
-        spawner.spawnLevel();
+
+        
+        let seq = SKAction.sequence([
+                SKAction.wait(forDuration: 3),
+                SKAction.run({
+                    self.carrierSpawn(count: 5, speed: 300)
+                })
+         ]);
+        
+        let rep = SKAction.repeatForever(seq);
+        
+        self.run(rep);
     }
     
     //enemy prototype funcs
@@ -462,8 +499,6 @@ class Carrier: SKSpriteNode, enemy, enemyWatchDelegate {
     func destroy() {
         self.isHidden = true
         self.hp = 0
-        self.spawner.removeAllActions();
-        self.spawner.removeAllChildren();
         self.removeAllActions()
         eventWatch?.didDestroyEnemy(node: self, param: "dead,500");
     }
@@ -471,10 +506,8 @@ class Carrier: SKSpriteNode, enemy, enemyWatchDelegate {
     func suicide() -> Int{
         self.isHidden = true
         self.hp = 0
-        self.spawner.removeAllActions();
-        self.spawner.removeAllChildren();
         self.removeAllActions()
-        eventWatch?.didDestroyEnemy(node: self, param: "dead,0");
+        eventWatch?.didDestroyEnemy(node: self, param: "suicide,0");
         return 50
     }
     
@@ -506,10 +539,10 @@ class PowerUp: SKSpriteNode, enemy, enemyWatchDelegate {
         self.eventWatch = delegate
         self.hp = baseHP
         
-        sprites.append(UIColor.yellow);
         sprites.append(UIColor.blue);
-//        sprites.append(UIColor.red);
-//        sprites.append(UIColor.green);
+        sprites.append(UIColor.red);
+        sprites.append(UIColor.green);
+        sprites.append(UIColor.yellow);
         
         self.color = sprites[type];
         
@@ -548,7 +581,7 @@ class PowerUp: SKSpriteNode, enemy, enemyWatchDelegate {
     
     func action(level: Int) {
         let seq = SKAction.sequence([
-            SKAction.wait(forDuration: 1.0),
+            SKAction.wait(forDuration: 0.50),
             SKAction.run({
                 self.type += 1;
                 let index = self.type % self.sprites.count;
@@ -569,7 +602,7 @@ class PowerUp: SKSpriteNode, enemy, enemyWatchDelegate {
         self.isHidden = true
         self.hp = 0
         self.removeAllActions()
-        eventWatch?.didDestroyEnemy(node: self, param: "dead,0")
+        eventWatch?.didDestroyEnemy(node: self, param: "suicide,0")
         return 0
     }
 

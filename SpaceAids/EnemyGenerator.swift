@@ -57,13 +57,10 @@ class EnemyGenerator: SKNode, enemyWatchDelegate {
     
     func didDestroyEnemy(node: enemy, param: String?) {
         let n = node as! SKNode;
-        let p = n.position;
         
         n.removeAllActions();
         n.removeFromParent();
         guard let msg = param else {
-            n.removeAllActions();
-            n.removeFromParent();
             return;
         }
         let params: [String] = msg.components(separatedBy: ",");
@@ -71,13 +68,11 @@ class EnemyGenerator: SKNode, enemyWatchDelegate {
         if(type == "crit"){
 
         } else if(type == "dead") {
-            mainScene?.enemyDestroyed(node: self, points: Int(params[1])!)
-            let f = self.convert(p, to: mainScene!.ParticleOverlay);
-            print(f);
-            mainScene?.createTextParticle(text: "+"+params[1], position: f)
-
+            mainScene?.enemyDestroyed(node: n, points: Int(params[1])!)
         } else if(type == "power"){
             mainScene?.powerUp(type: Int(params[1])!);
+        } else if(type == "suicide"){
+            
         }
     }
     
@@ -179,18 +174,6 @@ class EnemyGenerator: SKNode, enemyWatchDelegate {
         bossLoop.addLine(to: CGPoint(x: domain/2, y: -range/3));
         bossLoop.addLine(to: CGPoint(x: domain/2, y: -range));
         paths.append(bossLoop.cgPath);
-        
-        
-        //crayz loop
-//        let czStart = domain - 100
-//        var loopStart = CGPoint(x: lstartX, y: -(range/3));
-//        let loop1 = UIBezierPath()
-//        loop1.move(to: CGPoint(x: lstartX, y: 0))
-//        loop1.addLine(to: loopStart)
-//        loop1.addArc(withCenter: CGPoint(x: lstartX - radius, y: loopStart.y), radius: radius, startAngle: 0, endAngle:CGFloat.pi*2, clockwise: true)
-//        loop1.addLine(to: CGPoint(x: lstartX, y: -range))
-//        paths.append(loop1.cgPath)
-    
     }
     
     func spawnWave()->TimeInterval{

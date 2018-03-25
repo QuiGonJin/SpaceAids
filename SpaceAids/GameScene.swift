@@ -58,6 +58,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     //player
     var health: Int = 100
     var maxHealth: Int = 150
+    var lifesteal: CGFloat = 0.05;
     var level: Int = 1
     var score: Int = 0
     var cam: SKCameraNode?
@@ -204,7 +205,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             let touchedNode = UIOverlay.atPoint(point)
             if(touchedNode.name == "Turret"){
                 let tur = touchedNode as! Turret
-                tur.toggleWeapon();
+//                tur.toggleWeapon();
+                tur.activateSupercharge();
             }
         }
     }
@@ -242,11 +244,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     //Particles
     
-    func createTextParticle(text: String, position: CGPoint?, duration: Double = 0.5, fontSize: CGFloat = 60){
+    func createTextParticle(text: String, position: CGPoint?, color: UIColor = UIColor.yellow, duration: Double = 0.5, fontSize: CGFloat = 60){
         let label = SKLabelNode(text: text);
         label.fontSize = fontSize;
         label.fontName = "HelveticaNeue";
-        label.fontColor = UIColor.yellow;
+        label.fontColor = color;
         if let pos = position {
             label.position = pos;
         } else {
@@ -283,7 +285,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         self.scoreLabel.text = String(score);
         
         //lifesteal
-        let bonus: Int = points / 10;
+        let bonus: Int = Int(CGFloat(points) * lifesteal);
         if(bonus + health < maxHealth){
             health += bonus;
         } else {
@@ -291,23 +293,67 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
         self.healthLabel.text = String(health);
         
-        let p = node.position;
-        let posIn = node.parent?.convert(node.position, to: ParticleOverlay);
-//        print(posIn);
-//        createTextParticle(text: "+"+String(points), position: posIn)
+        let f = spawner?.convert(node.position, to: ParticleOverlay);
+        createTextParticle(text: String(points), position: f)
     }
     
     func powerUp(type: Int){
+        var typeString:String = "";
+        var color = UIColor.red;
         if(type == 0){
+            typeString = "Speed"
+            color = UIColor.blue;
             for tur in turrets {
                 tur.upgradeRoF();
             }
         } else if (type == 1){
+            typeString = "Damage"
+            color = UIColor.red;
             for tur in turrets {
                 tur.upgradeDmg();
             }
+        } else if (type == 2){
+            typeString = "Health"
+            color = UIColor.green;
+            self.maxHealth += 10;
+        } else if (type == 3){
+            typeString = "Supercharge"
+            for tur in turrets {
+                tur.supercharge();
+            }
+            color = UIColor.yellow;
+        } else if (type == 10){
+            typeString = "Double Turret"
+
+            turrets[0].position = CGPoint(x: -200, y: 100);
+
+            let turret2 = Turret(scene: self, size: CGSize(width: 200, height: 200))
+            turret2.position = CGPoint(x: 200, y: 100)
+            UIOverlay.addChild(turret2)
+            turrets.append(turret2)
+            
+            for tur in turrets {
+                tur.reset();
+            }
+            
+        } else if (type == 11){
+            typeString = "Triple Turret"
+            
+            turrets[0].position = CGPoint(x: -300, y: 100);
+            turrets[1].position = CGPoint(x: 300, y: 100);
+            
+            let turret2 = Turret(scene: self, size: CGSize(width: 200, height: 200))
+            turret2.position = CGPoint(x: 0, y: 100)
+            UIOverlay.addChild(turret2)
+            turrets.append(turret2)
+            
+            for tur in turrets {
+                tur.reset();
+            }
         }
         
+        
+        createTextParticle(text: "+"+typeString, position: CGPoint(x: 0, y: screenSize!.height - 600), color: color);
     }
     
     //update funcs
@@ -329,30 +375,16 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 level += 1;
                 let didLoad = spawner!.loadLevel("level_"+String(level));
                 if(didLoad){
-                    
                     createTextParticle(text: "LEVEL "+String(level), position: nil, duration: 3.0, fontSize: 90)
-//                    let label = SKLabelNode(text: "LEVEL " + String(level));
-//                    label.fontSize = 90;
-//                    label.fontColor = UIColor.yellow;
-//                    label.position = CGPoint(x: 0, y: screenSize!.height - 400)
-//                    self.UIOverlay.addChild(label);
-//
-//                    self.run(SKAction.sequence([
-//                        SKAction.wait(forDuration: 3.0),
-//                        SKAction.run({
-//                            label.removeFromParent();
-//                        })
-//                    ]));
-                    
                     self.lastSpawned = currentTime;
                     self.spawnDelay = 3.5;
+                    
+//                    self.powerUp(type: 10)
+//                    self.powerUp(type: 11)
+                    
                     checkSpawn = true;
                 } else {
-                    let label = SKLabelNode(text: "Victory!");
-                    label.fontSize = 90;
-                    label.fontColor = UIColor.yellow;
-                    label.position = CGPoint(x: 0, y: screenSize!.height - 400)
-                    self.UIOverlay.addChild(label);
+                    createTextParticle(text: "VICTORY", position: nil, duration: 3.0, fontSize: 90)
                 }
             }
         }
