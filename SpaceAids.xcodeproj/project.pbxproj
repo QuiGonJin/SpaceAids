@@ -13,6 +13,10 @@
 		E26BB8DF200F19E100B5A4B7 /* Spawner.swift in Sources */ = {isa = PBXBuildFile; fileRef = E26BB8DE200F19E100B5A4B7 /* Spawner.swift */; };
 		E278F6792067819300298489 /* test.csv in Resources */ = {isa = PBXBuildFile; fileRef = E278F6782067819300298489 /* test.csv */; };
 		E278F67B2067844300298489 /* level_3.csv in Resources */ = {isa = PBXBuildFile; fileRef = E278F67A2067844300298489 /* level_3.csv */; };
+		E2912F2D206786EC00CBC298 /* level_4.csv in Resources */ = {isa = PBXBuildFile; fileRef = E2912F2C206786EC00CBC298 /* level_4.csv */; };
+		E2912F2F206788F100CBC298 /* level_5.csv in Resources */ = {isa = PBXBuildFile; fileRef = E2912F2E206788F100CBC298 /* level_5.csv */; };
+		E2912F3120678A6D00CBC298 /* level_6.csv in Resources */ = {isa = PBXBuildFile; fileRef = E2912F3020678A6D00CBC298 /* level_6.csv */; };
+		E2912F3B206A05FC00CBC298 /* Loader.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2912F3A206A05FC00CBC298 /* Loader.swift */; };
 		E29C16B520033247002BAAF2 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E29C16B420033247002BAAF2 /* AppDelegate.swift */; };
 		E29C16B720033247002BAAF2 /* GameScene.sks in Resources */ = {isa = PBXBuildFile; fileRef = E29C16B620033247002BAAF2 /* GameScene.sks */; };
 		E29C16B920033247002BAAF2 /* Actions.sks in Resources */ = {isa = PBXBuildFile; fileRef = E29C16B820033247002BAAF2 /* Actions.sks */; };
@@ -56,6 +60,10 @@
 		E26BB8DE200F19E100B5A4B7 /* Spawner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Spawner.swift; sourceTree = "<group>"; };
 		E278F6782067819300298489 /* test.csv */ = {isa = PBXFileReference; lastKnownFileType = text; path = test.csv; sourceTree = "<group>"; };
 		E278F67A2067844300298489 /* level_3.csv */ = {isa = PBXFileReference; lastKnownFileType = text; path = level_3.csv; sourceTree = "<group>"; };
+		E2912F2C206786EC00CBC298 /* level_4.csv */ = {isa = PBXFileReference; lastKnownFileType = text; path = level_4.csv; sourceTree = "<group>"; };
+		E2912F2E206788F100CBC298 /* level_5.csv */ = {isa = PBXFileReference; lastKnownFileType = text; path = level_5.csv; sourceTree = "<group>"; };
+		E2912F3020678A6D00CBC298 /* level_6.csv */ = {isa = PBXFileReference; lastKnownFileType = text; path = level_6.csv; sourceTree = "<group>"; };
+		E2912F3A206A05FC00CBC298 /* Loader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Loader.swift; sourceTree = "<group>"; };
 		E29C16B120033247002BAAF2 /* SpaceAids.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SpaceAids.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E29C16B420033247002BAAF2 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		E29C16B620033247002BAAF2 /* GameScene.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = GameScene.sks; sourceTree = "<group>"; };
@@ -147,6 +155,7 @@
 				E2AFC15E202190560045725A /* Weapon.swift */,
 				E2CE1D1C204684B700C7C7E8 /* EnemyGenerator.swift */,
 				E21A793B2054FBA4006E9BFD /* Util.swift */,
+				E2912F3A206A05FC00CBC298 /* Loader.swift */,
 			);
 			path = SpaceAids;
 			sourceTree = "<group>";
@@ -177,6 +186,9 @@
 				E2CE1D232054F0AA00C7C7E8 /* level_2.csv */,
 				E278F6782067819300298489 /* test.csv */,
 				E278F67A2067844300298489 /* level_3.csv */,
+				E2912F2C206786EC00CBC298 /* level_4.csv */,
+				E2912F2E206788F100CBC298 /* level_5.csv */,
+				E2912F3020678A6D00CBC298 /* level_6.csv */,
 			);
 			path = levels;
 			sourceTree = "<group>";
@@ -288,7 +300,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E2912F3120678A6D00CBC298 /* level_6.csv in Resources */,
 				E29C16C020033247002BAAF2 /* Main.storyboard in Resources */,
+				E2912F2F206788F100CBC298 /* level_5.csv in Resources */,
 				E2CE1D202047DC8500C7C7E8 /* level_1.csv in Resources */,
 				E29C16B720033247002BAAF2 /* GameScene.sks in Resources */,
 				E29C16C220033247002BAAF2 /* Assets.xcassets in Resources */,
@@ -296,6 +310,7 @@
 				E2CE1D2220510F1000C7C7E8 /* carrier.csv in Resources */,
 				E2CE1D242054F0AA00C7C7E8 /* level_2.csv in Resources */,
 				E29C16B920033247002BAAF2 /* Actions.sks in Resources */,
+				E2912F2D206786EC00CBC298 /* level_4.csv in Resources */,
 				E278F6792067819300298489 /* test.csv in Resources */,
 				E278F67B2067844300298489 /* level_3.csv in Resources */,
 			);
@@ -324,6 +339,7 @@
 			files = (
 				E21A793C2054FBA4006E9BFD /* Util.swift in Sources */,
 				E26BB8DF200F19E100B5A4B7 /* Spawner.swift in Sources */,
+				E2912F3B206A05FC00CBC298 /* Loader.swift in Sources */,
 				E2AFC15D20143AAB0045725A /* Enemy.swift in Sources */,
 				E2CE1D1D204684B700C7C7E8 /* EnemyGenerator.swift in Sources */,
 				E26BB8DB2009E07C00B5A4B7 /* PathBuilder.swift in Sources */,

@@ -82,6 +82,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     override func sceneDidLoad() {
         //default crap
+        Assets.load();
+        
         self.lastUpdateTime = 0
         screenSize = Util.getVisibleScreen(sceneWidth: self.frame.width, sceneHeight: self.frame.height, viewWidth: UIScreen.main.bounds.width, viewHeight: UIScreen.main.bounds.height)
         
@@ -114,17 +116,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         bottomBar.physicsBody?.contactTestBitMask = BitMasksEnum.ALL_BLOCK_CATEGORY_BM
         self.UIOverlay.addChild(bottomBar)
         
-        //turret
-//        turret = Turret(scene: self, size: CGSize(width: 200, height: 200))
-//        turret?.position = CGPoint(x: 200, y: 100)
-//        UIOverlay.addChild(turret!)
-//        turrets.append(turret!)
-//
-//        let turret2 = Turret(scene: self, size: CGSize(width: 200, height: 200))
-//        turret2.position = CGPoint(x: -200, y: 100)
-//        UIOverlay.addChild(turret2)
-//        turrets.append(turret2)
-        
         let turret3 = Turret(scene: self, size: CGSize(width: 200, height: 200))
         turret3.position = CGPoint(x: 0, y: 100)
         UIOverlay.addChild(turret3)
@@ -137,11 +128,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         self.spawner?.initPaths();
         self.addChild(spawner!);
         
-        //toggle weapon
-        toggleWeaponButton = SKSpriteNode(color: UIColor.green, size: CGSize(width: 200, height: 200));
-        toggleWeaponButton?.position = CGPoint(x: (w / 2) - 100, y: 100)
-        toggleWeaponButton?.name = "toggleWeaponButton"
-        UIOverlay.addChild(toggleWeaponButton!)
         
         //labels
         scoreLabel = SKLabelNode()
@@ -167,7 +153,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         self.touchNode?.position = CGPoint(x: 0, y: 0)
         self.UIOverlay.addChild((self.touchNode)!)
     
-        
+        self.powerUp(type: 10);
     }
     
     //TOUCH COMANDS
@@ -237,7 +223,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                     }
     
                 tur.zRotation = theta
-                tur.activeWeapon?.fire(theta: theta)
+                tur.fire(theta: theta)
+//                tur.activeWeapon?.fire(theta: theta)
             }
         }
     }
