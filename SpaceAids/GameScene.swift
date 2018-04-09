@@ -55,6 +55,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     //Particles
     var ParticleOverlay: SKNode = SKNode();
     
+    var projectileEmitters: NodeCollection?;
+    var explosionEmitters: NodeCollection?;
+    var criticalEmitters : NodeCollection?;
+    
     //player
     var health: Int = 100
     var maxHealth: Int = 150
@@ -69,6 +73,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var spawnDelay: TimeInterval = 0
     var checkSpawn: Bool = true
 
+    
     override init(size: CGSize) {
         super.init(size: CGSize(width: size.width, height: size.height))
         self.physicsWorld.gravity = CGVector(dx: 0, dy: 0);
@@ -117,9 +122,38 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         self.UIOverlay.addChild(bottomBar)
         
         let turret3 = Turret(scene: self, size: CGSize(width: 200, height: 200))
-        turret3.position = CGPoint(x: 0, y: 100)
+        turret3.position = CGPoint(x: 0, y: 150)
         UIOverlay.addChild(turret3)
         turrets.append(turret3)
+        
+        //emitter
+        
+        var eEmitters = [SKEmitterWrapper]();
+        for _ in 0..<6 {
+            let myEmit = SKEmitterWrapper(emitter: SKEmitterNode(fileNamed:"Explosion.sks")!)
+            ParticleOverlay.addChild(myEmit)
+            eEmitters.append(myEmit)
+        }
+        explosionEmitters = NodeCollection(collection: eEmitters);
+        
+        
+        var hitEmitters = [SKEmitterWrapper]();
+        for _ in 0..<4 {
+            let myEmit = SKEmitterWrapper(emitter: SKEmitterNode(fileNamed: "HitParticle.sks")!)
+            ParticleOverlay.addChild(myEmit)
+            hitEmitters.append(myEmit)
+        }
+        projectileEmitters = NodeCollection(collection: hitEmitters);
+        
+        
+        var cEmitters = [SKEmitterWrapper]();
+        for _ in 0..<4 {
+            let myEmit = SKEmitterWrapper(emitter: SKEmitterNode(fileNamed: "CritParticle.sks")!)
+            ParticleOverlay.addChild(myEmit)
+            cEmitters.append(myEmit)
+        }
+        criticalEmitters = NodeCollection(collection: cEmitters);
+        
         
         //spawner
         let lvlName:String = "level_" + String(level);
@@ -189,10 +223,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             }
         } else {
             let touchedNode = UIOverlay.atPoint(point)
-            if(touchedNode.name == "Turret"){
-                let tur = touchedNode as! Turret
-//                tur.toggleWeapon();
-                tur.activateSupercharge();
+            if(touchedNode.name == "Turret" || touchedNode.name == "Slide"){
+                for tur in turrets {
+                    tur.activateSupercharge();
+                }
             }
         }
     }
@@ -224,7 +258,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
                 tur.zRotation = theta
                 tur.fire(theta: theta)
-//                tur.activeWeapon?.fire(theta: theta)
             }
         }
     }
@@ -281,6 +314,14 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         self.healthLabel.text = String(health);
         
         let f = spawner?.convert(node.position, to: ParticleOverlay);
+        
+        
+        if let wrap = explosionEmitters?.getNext() {
+            let wrapEmit = wrap as! SKEmitterWrapper;
+            wrapEmit.position = f!;
+            wrapEmit.Emitter?.resetSimulation();
+        }
+        
         createTextParticle(text: String(points), position: f)
     }
     
@@ -322,6 +363,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             for tur in turrets {
                 tur.reset();
             }
+            
+            turrets[0].weapons[0].ROF = turrets[0].weapons[0].ROF - 1
             
         } else if (type == 11){
             typeString = "Triple Turret"

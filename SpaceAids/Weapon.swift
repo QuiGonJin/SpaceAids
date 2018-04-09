@@ -34,13 +34,20 @@ class Turret: SKSpriteNode {
     var charge = true;
     var chargeNotActive = true;
     var muzzleSprites: SpriteCollection?;
+    var slide: SKSpriteNode?;
     
     override init(texture: SKTexture!, color: SKColor, size: CGSize) {
-        super.init(texture: nil, color: color, size: size)
+        super.init(texture: texture, color: color, size: size)
     }
     
     convenience init(scene: GameScene, size: CGSize){
-        self.init(texture: nil, color: UIColor.blue, size: size)
+        self.init(texture: SKTexture(imageNamed:"turret_sprite"), color: UIColor.clear, size: size);
+
+        slide = SKSpriteNode(texture: SKTexture(imageNamed:"turret_slide"), color: UIColor.clear, size: size);
+        slide?.position = CGPoint(x: 0, y: 0);
+        slide?.name = "Slide";
+        self.addChild(slide!);
+        
         self.myScene = scene
         self.name = "Turret"
         self.weapons.append(Rifle(scene: myScene!, turret: self))
@@ -50,10 +57,7 @@ class Turret: SKSpriteNode {
         var mSprites = [SKSpriteNode]();
         for i in 0..<Assets.muzzleSprites.count {
             let HS = SKSpriteNode(texture : Assets.muzzleSprites[i]);
-//            HS.size = CGSize(width: 500, height: 500);
 
-            HS.setScale(1.5)
-            
             HS.anchorPoint = CGPoint(x: 0.5, y: 0)
             HS.position = self.position;
             HS.isHidden = true;
@@ -69,6 +73,18 @@ class Turret: SKSpriteNode {
         self.activeWeapon = self.weapons[0]
         activeWeapon?.activate()
         activeWeapon?.ready = true
+    }
+    
+    func blowback(frames: Int){
+        let duration:Double = Double(frames) / (60.0);
+        let linePath0 = UIBezierPath()
+        linePath0.move(to: CGPoint(x: 0, y: -100))
+        linePath0.addLine(to: CGPoint(x: 0, y: 0))
+        
+        let action = SKAction.follow(linePath0.cgPath, asOffset: false, orientToPath: false, duration: duration);
+        if(!self.slide!.hasActions()){
+            self.slide?.run(action);
+        }
     }
     
     func fire(theta: CGFloat) {
@@ -108,7 +124,6 @@ class Turret: SKSpriteNode {
     
     func supercharge() {
         self.charge = true;
-        self.color = UIColor.yellow;
     }
     
     func activateSupercharge(){
@@ -175,9 +190,6 @@ class Rifle: weapon {
         for i in 0..<Assets.bulletSprites.count {
             let HS = SKSpriteNode(texture: Assets.bulletSprites[i])
 
-            HS.colorBlendFactor = 1.0
-            HS.color = UIColor.cyan
-
             HS.anchorPoint = CGPoint(x: 0.5, y: 1)
             HS.position = CGPoint(x: 0, y: 0)
             HS.isHidden = true
@@ -233,6 +245,7 @@ class Rifle: weapon {
         HSSprite?.position = start
         HSSprite?.zRotation = angle
         
+        
         let seq = SKAction.sequence([
             SKAction.wait(forDuration: 0.05),
             SKAction.run({
@@ -258,6 +271,7 @@ class Rifle: weapon {
         
         if let _ = hitNode {
             self.renderHitscan(angle: angleFromYAxis, start: hitPosition!, end: start)
+            
             self.handleHitscanEvents(node: hitNode, point: hitPosition)
         } else {
             self.renderHitscan(angle: angleFromYAxis, start: end, end: start)
@@ -268,6 +282,29 @@ class Rifle: weapon {
     
     func handleHitscanEvents(node: SKNode?, point: CGPoint?){
         if let hitNode = node as? enemy{
+            
+            //render particles
+            if(node!.name == "CriticalSpot"){
+                if let emitN = scene.criticalEmitters?.getNext() {
+                    let emitNWrap = emitN as! SKEmitterWrapper;
+                    
+                    emitNWrap.zRotation = self.turret.zRotation;
+                    emitNWrap.position = point!
+                    emitNWrap.Emitter?.resetSimulation()
+                }
+            }
+            else
+            {
+                if let emitN = scene.projectileEmitters?.getNext() {
+                    let emitNWrap = emitN as! SKEmitterWrapper;
+                    
+                    emitNWrap.zRotation = self.turret.zRotation;
+                    emitNWrap.position = point!
+                    emitNWrap.Emitter?.resetSimulation()                }
+                
+            }
+            
+            
             hitNode.hit(point: point!, damage: self.damage)
         }
     }
@@ -277,6 +314,7 @@ class Rifle: weapon {
             if(self.ammo > 0){
                 if(CGFloat(deltaFramesLastFired) > ROF){
                     self.turret.renderMuzzleFlare();
+                    self.turret.blowback(frames: (Int)(ROF));
                     let startPos = self.turret.position
                     let farEndPoint = CGPoint(x: -SCAN_LENGTH*sin(theta) + self.turret.position.x,
                                               y: SCAN_LENGTH*cos(theta) + self.turret.position.y)
@@ -292,7 +330,7 @@ class Rifle: weapon {
 
 class Magnum: weapon {
     var scene:GameScene
-    var turret: SKNode
+    var turret: Turret
     var projectileSprites: SpriteCollection
     var deltaFramesLastFired = 10
     var ROF:CGFloat = 9
@@ -308,13 +346,13 @@ class Magnum: weapon {
     let t = -0.01;
     
     
-    init(scene: GameScene, turret: SKNode){
+    init(scene: GameScene, turret: Turret){
         self.SCAN_LENGTH = sqrt(pow(scene.frame.height, 2) + pow(scene.frame.width/2, 2))
         self.scene = scene
         self.ammo = self.magazineSize
         self.turret = turret
         //init sprites
-        let HS3: SKSpriteNode = SKSpriteNode(color: UIColor.yellow, size: CGSize(width: 10, height: 3000));
+        let HS3: SKSpriteNode = SKSpriteNode(color: UIColor.cyan, size: CGSize(width: 20, height: 3000));
         
         var hitscanSprites = [SKSpriteNode]();
         
@@ -372,9 +410,13 @@ class Magnum: weapon {
         HSSprite?.position = start
         HSSprite?.zRotation = angle
         
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
-            HSSprite?.isHidden = true
-        }
+        let seq = SKAction.sequence([
+            SKAction.wait(forDuration: 0.05),
+            SKAction.run({
+                HSSprite?.isHidden = true
+            })
+            ]);
+        self.turret.run(seq);
     }
     
     func hitscan(angleFromYAxis:CGFloat, start:CGPoint, end:CGPoint){
@@ -385,7 +427,7 @@ class Magnum: weapon {
                     }
             }
         )
-    
+
        self.renderHitscan(angle: angleFromYAxis, start: end, end: start)
         deltaFramesLastFired = 0
     }
@@ -393,15 +435,25 @@ class Magnum: weapon {
     func handleHitscanEvents(node: SKNode?, point: CGPoint?){
         if let hitNode = node as? enemy{
             hitNode.hit(point: point!, damage: self.damage)
+            
+            if let emitN = scene.projectileEmitters?.getNext() {
+                let emitNWrap = emitN as! SKEmitterWrapper;
+                
+                emitNWrap.zRotation = self.turret.zRotation;
+                emitNWrap.position = point!
+                emitNWrap.Emitter?.resetSimulation()
+            }
+            
         }
     }
-    
     
     
     func fire(theta: CGFloat) {
         if(self.ready){
             if(self.ammo > 0){
                 if(CGFloat(deltaFramesLastFired) > ROF){
+                    self.turret.renderMuzzleFlare();
+                    self.turret.blowback(frames: (Int)(ROF));
                     let startPos = self.turret.position
                     let farEndPoint = CGPoint(x: -SCAN_LENGTH*sin(theta) + self.turret.position.x,
                                               y: SCAN_LENGTH*cos(theta) + self.turret.position.y)

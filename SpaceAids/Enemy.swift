@@ -28,7 +28,8 @@ class CriticalSpot: SKSpriteNode, enemy {
     }
     
     convenience init(position: CGPoint, size: CGSize, delegate: enemyWatchDelegate?) {
-        self.init(texture:nil, color: UIColor.yellow, size: size)
+        self.init(texture: Assets.critSpotSprite);
+        self.size = size;
         self.name = "CriticalSpot"
         self.eventWatch = delegate
 
@@ -78,7 +79,8 @@ class SuicideBomber: SKSpriteNode, enemy, enemyWatchDelegate {
     }
     
     convenience init(position: CGPoint, size: CGSize, delegate: enemyWatchDelegate?) {
-        self.init(texture:nil, color: UIColor.blue, size: size)
+        self.init(texture: Assets.suicideSprites[0], color: SKColor.clear, size: size);
+        
         self.name = "SuicideBomber"
         self.eventWatch = delegate
         self.hp = baseHP
@@ -112,6 +114,8 @@ class SuicideBomber: SKSpriteNode, enemy, enemyWatchDelegate {
     }
     
     func action(level: Int) {
+        let f = SKAction.animate(with: Assets.suicideSprites, timePerFrame: 0.5);
+        self.run(SKAction.repeatForever(f));
     }
     
     //enemy prototype funcs
@@ -161,7 +165,8 @@ class Fighter: SKSpriteNode, enemy, enemyWatchDelegate {
     }
     
     convenience init(position: CGPoint, size: CGSize, delegate: enemyWatchDelegate?) {
-        self.init(texture:nil, color: UIColor.green, size: size)
+        self.init(texture: Assets.fighterSprites[0], color: SKColor.clear, size: size);
+        
         self.name = "Fighter"
         self.eventWatch = delegate
         self.hp = baseHP
@@ -244,7 +249,8 @@ class LilBasterd: SKSpriteNode, enemy, enemyWatchDelegate {
     }
     
     convenience init(position: CGPoint, size: CGSize, delegate: enemyWatchDelegate?) {
-        self.init(texture:nil, color: UIColor.cyan, size: size)
+        self.init(texture: Assets.lilBasterdSprites[0], color: SKColor.clear, size: size);
+        
         self.name = "LilBasterd"
         self.eventWatch = delegate
         self.hp = baseHP
@@ -404,7 +410,7 @@ class Carrier: SKSpriteNode, enemy, enemyWatchDelegate {
     }
     
     convenience init(position: CGPoint, size: CGSize, delegate: enemyWatchDelegate?) {
-        self.init(texture:nil, color: UIColor.gray, size: size)
+        self.init(texture: Assets.lilBasterdSprites[0], color: SKColor.clear, size: size);
         self.name = "Carrier"
         self.eventWatch = delegate
         self.hp = baseHP
