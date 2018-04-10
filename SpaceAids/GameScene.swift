@@ -59,6 +59,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var explosionEmitters: NodeCollection?;
     var criticalEmitters : NodeCollection?;
     
+    
     //player
     var health: Int = 100
     var maxHealth: Int = 150
@@ -88,6 +89,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     override func sceneDidLoad() {
         //default crap
         Assets.load();
+        SoundMaster.load();
         
         self.lastUpdateTime = 0
         screenSize = Util.getVisibleScreen(sceneWidth: self.frame.width, sceneHeight: self.frame.height, viewWidth: UIScreen.main.bounds.width, viewHeight: UIScreen.main.bounds.height)
@@ -187,7 +189,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         self.touchNode?.position = CGPoint(x: 0, y: 0)
         self.UIOverlay.addChild((self.touchNode)!)
     
-        self.powerUp(type: 10);
+//        self.powerUp(type: 10);
+//        self.powerUp(type: 11);
     }
     
     //TOUCH COMANDS
@@ -364,7 +367,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 tur.reset();
             }
             
-            turrets[0].weapons[0].ROF = turrets[0].weapons[0].ROF - 1
+            //offset shots
+            let timeBetweenShots = turrets[1].weapons[0].ROF / 60;
+            let myDelay = timeBetweenShots/2;
+            turrets[1].weapons[0].readyDelay = Double(myDelay)
+            turrets[1].weapons[1].readyDelay = Double(myDelay)
             
         } else if (type == 11){
             typeString = "Triple Turret"
@@ -380,6 +387,15 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             for tur in turrets {
                 tur.reset();
             }
+            
+            let timeBetweenShots = turrets[1].weapons[0].ROF / 60;
+            let myDelay = timeBetweenShots/3;
+            turrets[1].weapons[0].readyDelay = Double(myDelay)
+            turrets[1].weapons[1].readyDelay = Double(myDelay)
+            
+            turrets[2].weapons[0].readyDelay = Double(myDelay*2)
+            turrets[2].weapons[1].readyDelay = Double(myDelay*2)
+            
         }
         
         

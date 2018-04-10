@@ -17,6 +17,7 @@ protocol weapon {
     var ready: Bool { get set }
     var damage: Int { get set }
     var ammo: Int { get set }
+    var readyDelay: TimeInterval { get set }
     func fire(theta: CGFloat)
     func reload()
     func activate()
@@ -58,6 +59,7 @@ class Turret: SKSpriteNode {
         for i in 0..<Assets.muzzleSprites.count {
             let HS = SKSpriteNode(texture : Assets.muzzleSprites[i]);
 
+            HS.zPosition = 2;
             HS.anchorPoint = CGPoint(x: 0.5, y: 0)
             HS.position = self.position;
             HS.isHidden = true;
@@ -173,7 +175,7 @@ class Rifle: weapon {
     var magazineSize: Int = 30
     var SCAN_LENGTH:CGFloat = 3000
     var ready: Bool = false
-    var readyDelay: TimeInterval = 1.0
+    var readyDelay: TimeInterval = 0
     var reloadDelay: TimeInterval = 1.4
     var ROF_level:Double = 0;
     let e = 2.71828;
@@ -256,28 +258,44 @@ class Rifle: weapon {
     }
     
     func hitscan(angleFromYAxis:CGFloat, start:CGPoint, end:CGPoint){
-        var hitNode: SKNode?;
-        var hitPosition: CGPoint?;
+        deltaFramesLastFired = 0
         
-        scene.physicsWorld.enumerateBodies(alongRayStart: start, end: end,
-                using: { (body, point, normal, stop) in
-                    if(body.categoryBitMask >= BitMasksEnum.BLOCK_CONTACT_BM){
-                        hitNode = body.node
-                        hitPosition = point
-                        stop.pointee = true
-                    }
-                }
-        )
-        
-        if let _ = hitNode {
-            self.renderHitscan(angle: angleFromYAxis, start: hitPosition!, end: start)
+        let action = SKAction.run {
+            var hitNode: SKNode?;
+            var hitPosition: CGPoint?;
             
-            self.handleHitscanEvents(node: hitNode, point: hitPosition)
-        } else {
-            self.renderHitscan(angle: angleFromYAxis, start: end, end: start)
+            
+            self.scene.physicsWorld.enumerateBodies(alongRayStart: start, end: end,
+                                               using: { (body, point, normal, stop) in
+                                                if(body.categoryBitMask >= BitMasksEnum.BLOCK_CONTACT_BM){
+                                                    hitNode = body.node
+                                                    hitPosition = point
+                                                    stop.pointee = true
+                                                }
+            }
+            )
+            
+            if let myNode = hitNode {
+                if(myNode.name == "CriticalSpot"){
+                    self.turret.run(SoundMaster.getCritSound());
+                } else {
+                    self.turret.run(SoundMaster.getArmorSound());
+                }
+                
+                self.renderHitscan(angle: angleFromYAxis, start: hitPosition!, end: start)
+                
+                self.handleHitscanEvents(node: hitNode, point: hitPosition)
+            } else {
+                self.turret.run(SoundMaster.getGunSound());
+                self.renderHitscan(angle: angleFromYAxis, start: end, end: start)
+            }
         }
         
-        deltaFramesLastFired = 0
+        let seq = SKAction.sequence([
+            SKAction.wait(forDuration: readyDelay),
+            action
+        ])
+        self.turret.run(seq);
     }
     
     func handleHitscanEvents(node: SKNode?, point: CGPoint?){
@@ -339,7 +357,7 @@ class Magnum: weapon {
     var magazineSize: Int = 30
     var SCAN_LENGTH:CGFloat = 3000
     var ready: Bool = false
-    var readyDelay: TimeInterval = 1.0
+    var readyDelay: TimeInterval = 0
     var reloadDelay: TimeInterval = 1.4
     var ROF_level:Double = 0;
     let e = 2.71828;
