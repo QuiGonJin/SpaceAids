@@ -32,10 +32,11 @@ class Turret: SKSpriteNode {
     var weaponIndex = 0
     var weapons:[weapon] = [weapon]()
     var myScene: GameScene?
-    var charge = true;
+    var charge = false;
     var chargeNotActive = true;
     var muzzleSprites: SpriteCollection?;
     var slide: SKSpriteNode?;
+    var superchargeEmitter: SKEmitterNode?
     
     override init(texture: SKTexture!, color: SKColor, size: CGSize) {
         super.init(texture: texture, color: color, size: size)
@@ -46,6 +47,7 @@ class Turret: SKSpriteNode {
 
         slide = SKSpriteNode(texture: SKTexture(imageNamed:"turret_slide"), color: UIColor.clear, size: size);
         slide?.position = CGPoint(x: 0, y: 0);
+        slide?.zPosition = 1;
         slide?.name = "Slide";
         self.addChild(slide!);
         
@@ -71,6 +73,9 @@ class Turret: SKSpriteNode {
             self.addChild(muzzleSprites!.spriteCollection[i])
         }
         
+        superchargeEmitter = SKEmitterNode(fileNamed: "Supercharge.sks")
+        superchargeEmitter?.isHidden = !self.charge;
+        self.addChild(superchargeEmitter!)
         
         self.activeWeapon = self.weapons[0]
         activeWeapon?.activate()
@@ -126,14 +131,14 @@ class Turret: SKSpriteNode {
     
     func supercharge() {
         self.charge = true;
+        superchargeEmitter?.isHidden = !self.charge;
     }
     
     func activateSupercharge(){
         if(self.charge && self.chargeNotActive){
-
             self.charge = false;
             self.chargeNotActive = false;
-            self.color = UIColor.blue;
+            superchargeEmitter?.isHidden = !self.charge;
             
             let seq = SKAction.sequence([
                 SKAction.run({
@@ -150,6 +155,7 @@ class Turret: SKSpriteNode {
     }
     
     func toggleWeapon(){
+        self.run(SoundMaster.swapWeaponSound)
         weaponIndex += 1
         if(weaponIndex >= weapons.count){
             weaponIndex = 0
@@ -169,7 +175,7 @@ class Rifle: weapon {
     var turret: Turret
     var projectileSprites: SpriteCollection
     var deltaFramesLastFired = 10
-    var ROF:CGFloat = 12
+    var ROF:CGFloat = 8
     var damage:Int = 1
     var ammo: Int = 0
     var magazineSize: Int = 30
@@ -351,7 +357,7 @@ class Magnum: weapon {
     var turret: Turret
     var projectileSprites: SpriteCollection
     var deltaFramesLastFired = 10
-    var ROF:CGFloat = 9
+    var ROF:CGFloat = 4
     var damage:Int = 1
     var ammo: Int = 0
     var magazineSize: Int = 30
@@ -437,31 +443,52 @@ class Magnum: weapon {
         self.turret.run(seq);
     }
     
+    
     func hitscan(angleFromYAxis:CGFloat, start:CGPoint, end:CGPoint){
-        scene.physicsWorld.enumerateBodies(alongRayStart: start, end: end,
-            using:  { (body, point, normal, stop) in
-                    if(body.categoryBitMask >= BitMasksEnum.BLOCK_CONTACT_BM){
-                        self.handleHitscanEvents(node: body.node, point: point)
-                    }
-            }
-        )
-
-       self.renderHitscan(angle: angleFromYAxis, start: end, end: start)
         deltaFramesLastFired = 0
+        
+
+        var hitNode: SKNode?;
+        var hitPosition: CGPoint?;
+        
+        
+        self.scene.physicsWorld.enumerateBodies(alongRayStart: start, end: end,
+                                           using:  { (body, point, normal, stop) in
+                                            if(body.categoryBitMask >= BitMasksEnum.BLOCK_CONTACT_BM){
+                                                self.handleHitscanEvents(node: body.node, point: point)
+                                            }
+        })
+        
+        self.turret.run(SoundMaster.getGunSound());
+        self.renderHitscan(angle: angleFromYAxis, start: end, end: start)
     }
     
     func handleHitscanEvents(node: SKNode?, point: CGPoint?){
         if let hitNode = node as? enemy{
-            hitNode.hit(point: point!, damage: self.damage)
             
-            if let emitN = scene.projectileEmitters?.getNext() {
-                let emitNWrap = emitN as! SKEmitterWrapper;
-                
-                emitNWrap.zRotation = self.turret.zRotation;
-                emitNWrap.position = point!
-                emitNWrap.Emitter?.resetSimulation()
+            //render particles
+            if(node!.name == "CriticalSpot"){
+                self.turret.run(SoundMaster.getCritSound());
+                if let emitN = scene.criticalEmitters?.getNext() {
+                    let emitNWrap = emitN as! SKEmitterWrapper;
+                    
+                    emitNWrap.zRotation = self.turret.zRotation;
+                    emitNWrap.position = point!
+                    emitNWrap.Emitter?.resetSimulation()
+                }
             }
-            
+            else
+            {
+                if let emitN = scene.projectileEmitters?.getNext() {
+                    let emitNWrap = emitN as! SKEmitterWrapper;
+                    
+                    emitNWrap.zRotation = self.turret.zRotation;
+                    emitNWrap.position = point!
+                    emitNWrap.Emitter?.resetSimulation()                }
+                
+            }
+
+            hitNode.hit(point: point!, damage: self.damage)
         }
     }
     

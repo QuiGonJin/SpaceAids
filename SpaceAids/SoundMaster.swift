@@ -13,6 +13,9 @@ class SoundMaster {
     static var gunSounds: [SKAction] = [SKAction]();
     static var armorSound = SKAction.playSoundFileNamed("armor_sound", waitForCompletion: false);
     static var critSound = SKAction.playSoundFileNamed("crit_sound", waitForCompletion: false);
+    static var explosionLightSound = SKAction.playSoundFileNamed("explosion_light", waitForCompletion: false);
+    static var explosionHeavySound = SKAction.playSoundFileNamed("explosion_heavy", waitForCompletion: false);
+    static var swapWeaponSound = SKAction.playSoundFileNamed("switch_weapon", waitForCompletion: false);
     
     static func load() {
         for i in 1...5{

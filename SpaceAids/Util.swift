@@ -44,5 +44,11 @@ class Util {
     static func SDistanceBetweenPoints(first: CGPoint, second: CGPoint)->CGFloat{
         return CGFloat(hypotf(Float(second.x - first.x), Float(second.y - first.y)));
     }
-    
+}
+
+enum BitMasksEnum {
+    static let BLOCK_CONTACT_BM:UInt32 = 1
+    static let HIT_CONTACT_BM:UInt32 = 2
+    static let CRIT_CONTACT_BM:UInt32 = 4
+    static let ALL_BLOCK_CATEGORY_BM:UInt32 = 0xFFFFFFFF
 }

@@ -10,6 +10,20 @@ import Foundation
 import UIKit
 import GameKit
 
+protocol enemy {
+    var hp: Int { get set }
+    var eventWatch: enemyWatchDelegate? { get set }
+    func hit(point: CGPoint, damage: Int)
+    func destroy()
+    func reset()
+    func action(level: Int)
+    func suicide()->Int
+}
+
+protocol enemyWatchDelegate {
+    func didDestroyEnemy(node: enemy, param: String?)
+}
+
 enum enemyTypeEnum {
     static let SUICIDE:Int = 1
     static let FIGHTER:Int = 2
@@ -140,7 +154,7 @@ class SuicideBomber: SKSpriteNode, enemy, enemyWatchDelegate {
         self.hp = 0
         self.removeAllActions()
         eventWatch?.didDestroyEnemy(node: self, param: "suicide,0")
-        return 50
+        return 1
     }
     
     
@@ -224,7 +238,7 @@ class Fighter: SKSpriteNode, enemy, enemyWatchDelegate {
         self.hp = 0
         self.removeAllActions()
         eventWatch?.didDestroyEnemy(node: self, param: "suicide,0")
-        return 20
+        return 1
     }
     
     
@@ -308,7 +322,7 @@ class LilBasterd: SKSpriteNode, enemy, enemyWatchDelegate {
         self.hp = 0
         self.removeAllActions()
         eventWatch?.didDestroyEnemy(node: self, param: "suicide,0")
-        return 20
+        return 1
     }
     
     func reset() {
@@ -387,7 +401,7 @@ class Bullet: SKSpriteNode, enemy, enemyWatchDelegate {
         self.hp = 0
         self.removeAllActions()
         eventWatch?.didDestroyEnemy(node: self, param: "suicide,0")
-        return 10
+        return 1
     }
     
     func reset() {
@@ -514,7 +528,7 @@ class Carrier: SKSpriteNode, enemy, enemyWatchDelegate {
         self.hp = 0
         self.removeAllActions()
         eventWatch?.didDestroyEnemy(node: self, param: "suicide,0");
-        return 50
+        return 1
     }
     
     func reset() {
@@ -609,7 +623,7 @@ class PowerUp: SKSpriteNode, enemy, enemyWatchDelegate {
         self.hp = 0
         self.removeAllActions()
         eventWatch?.didDestroyEnemy(node: self, param: "suicide,0")
-        return 0
+        return 1
     }
 
     func reset() {

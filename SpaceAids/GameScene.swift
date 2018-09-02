@@ -12,27 +12,6 @@ import UIKit
 
 var mainScene: GameScene?;
 
-enum BitMasksEnum {
-    static let BLOCK_CONTACT_BM:UInt32 = 1
-    static let HIT_CONTACT_BM:UInt32 = 2
-    static let CRIT_CONTACT_BM:UInt32 = 4
-    static let ALL_BLOCK_CATEGORY_BM:UInt32 = 0xFFFFFFFF
-}
-
-protocol enemy {
-    var hp: Int { get set }
-    var eventWatch: enemyWatchDelegate? { get set }
-    func hit(point: CGPoint, damage: Int)
-    func destroy()
-    func reset()
-    func action(level: Int)
-    func suicide()->Int
-}
-
-protocol enemyWatchDelegate {
-    func didDestroyEnemy(node: enemy, param: String?)
-}
-
 protocol gameEventDelegate {
     func didPowerUp(type: Int);
 }
@@ -49,8 +28,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var turret : Turret?
     var toggleWeaponButton: SKSpriteNode?
     var scoreLabel: SKLabelNode = SKLabelNode();
+    var highScoreLabel : SKLabelNode = SKLabelNode();
     var healthLabel: SKLabelNode = SKLabelNode();
     var touchNode : SKSpriteNode?
+    var pauseNode : SKSpriteNode?
+    var restartNode: SKSpriteNode?
+    var homeNode: SKSpriteNode?
     
     //Particles
     var ParticleOverlay: SKNode = SKNode();
@@ -61,12 +44,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     
     //player
-    var health: Int = 100
-    var maxHealth: Int = 150
-    var lifesteal: CGFloat = 0.05;
+    var health: Int = 5
+    var currHighScore: Int = 0
     var level: Int = 1
     var score: Int = 0
     var cam: SKCameraNode?
+    var chargeCounter = 0;
     
     //enemies
     var spawner: EnemyGenerator?
@@ -87,12 +70,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     override func sceneDidLoad() {
-        //default crap
-        Assets.load();
-        SoundMaster.load();
-        
         self.lastUpdateTime = 0
         screenSize = Util.getVisibleScreen(sceneWidth: self.frame.width, sceneHeight: self.frame.height, viewWidth: UIScreen.main.bounds.width, viewHeight: UIScreen.main.bounds.height)
+        currHighScore = UserDefaults.standard.integer(forKey: "SpaceAidsHighScore") as Int;
         
         //Camera
         //Move camera such that anchor is center bottom screen
@@ -107,6 +87,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         self.UIOverlay.position = CGPoint(x: 0, y: 0)
         self.UIOverlay.zPosition = 3
         self.addChild(UIOverlay)
+        
         
         //ParticalOverlay
         self.ParticleOverlay.position = CGPoint(x: 0, y: 0)
@@ -123,18 +104,18 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         bottomBar.physicsBody?.contactTestBitMask = BitMasksEnum.ALL_BLOCK_CATEGORY_BM
         self.UIOverlay.addChild(bottomBar)
         
-        let turret3 = Turret(scene: self, size: CGSize(width: 200, height: 200))
-        turret3.position = CGPoint(x: 0, y: 150)
-        UIOverlay.addChild(turret3)
-        turrets.append(turret3)
+        let turret = Turret(scene: self, size: CGSize(width: 200, height: 200))
+        turret.position = CGPoint(x: 0, y: 150)
+        UIOverlay.addChild(turret)
+        turrets.append(turret)
         
-        //emitter
-        
+        //emitters
         var eEmitters = [SKEmitterWrapper]();
-        for _ in 0..<6 {
+        for _ in 0..<4 {
             let myEmit = SKEmitterWrapper(emitter: SKEmitterNode(fileNamed:"Explosion.sks")!)
-            ParticleOverlay.addChild(myEmit)
+            myEmit.Emitter?.advanceSimulationTime(1)
             eEmitters.append(myEmit)
+            ParticleOverlay.addChild(myEmit)
         }
         explosionEmitters = NodeCollection(collection: eEmitters);
         
@@ -142,17 +123,19 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         var hitEmitters = [SKEmitterWrapper]();
         for _ in 0..<4 {
             let myEmit = SKEmitterWrapper(emitter: SKEmitterNode(fileNamed: "HitParticle.sks")!)
-            ParticleOverlay.addChild(myEmit)
+            myEmit.Emitter?.advanceSimulationTime(1)
             hitEmitters.append(myEmit)
+            ParticleOverlay.addChild(myEmit)
         }
         projectileEmitters = NodeCollection(collection: hitEmitters);
         
         
         var cEmitters = [SKEmitterWrapper]();
-        for _ in 0..<4 {
+        for _ in 0..<2 {
             let myEmit = SKEmitterWrapper(emitter: SKEmitterNode(fileNamed: "CritParticle.sks")!)
-            ParticleOverlay.addChild(myEmit)
+            myEmit.Emitter?.advanceSimulationTime(1)
             cEmitters.append(myEmit)
+            ParticleOverlay.addChild(myEmit)
         }
         criticalEmitters = NodeCollection(collection: cEmitters);
         
@@ -166,7 +149,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
         
         //labels
-        scoreLabel = SKLabelNode()
         scoreLabel.text = String(self.score)
         scoreLabel.fontName = "HelveticaNeue"
         scoreLabel.fontSize = 72
@@ -174,13 +156,39 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         scoreLabel.name = "scorelabel"
         UIOverlay.addChild(scoreLabel)
         
-        healthLabel = SKLabelNode()
+        highScoreLabel.text = "High Score: \n" + String(self.currHighScore)
+        highScoreLabel.fontName = "HelveticaNeue"
+        highScoreLabel.fontSize = 72
+        highScoreLabel.position = CGPoint(x: 0, y: h - (h/2))
+        highScoreLabel.name = "highScorelabel"
+        highScoreLabel.isHidden = true;
+        UIOverlay.addChild(highScoreLabel)
+        
         healthLabel.text = String(health)
         healthLabel.fontSize = 60
         healthLabel.fontName = "HelveticaNeue"
         healthLabel.position = CGPoint(x: 0, y: 50)
         healthLabel.name = "healthLabel"
+        healthLabel.zPosition = 5
         UIOverlay.addChild(healthLabel)
+        
+        pauseNode = SKSpriteNode(color: UIColor.yellow, size: CGSize(width: 120, height: 120))
+        pauseNode?.name = "pauseNode"
+        pauseNode?.position = CGPoint(x: -w/2 + 60, y: h - 60)
+        UIOverlay.addChild((pauseNode)!)
+        
+        restartNode = SKSpriteNode(color: UIColor.green, size: CGSize(width: 120, height: 120))
+        restartNode?.name = "restartNode"
+        restartNode?.position = CGPoint(x: -w/2 + 180, y: h - 60)
+        restartNode?.isHidden = true;
+        UIOverlay.addChild((restartNode)!)
+        
+        homeNode = SKSpriteNode(color: UIColor.blue, size: CGSize(width: 120, height: 120))
+        homeNode?.name = "homeNode"
+        homeNode?.position = CGPoint(x: -w/2 + 300, y: h - 60)
+        homeNode?.isHidden = true;
+        UIOverlay.addChild((homeNode)!)
+        
         
         //Controls
         self.touchNode = SKSpriteNode(color: UIColor.blue, size: CGSize(width: 50, height: 50))
@@ -188,9 +196,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         self.touchNode?.isHidden = true
         self.touchNode?.position = CGPoint(x: 0, y: 0)
         self.UIOverlay.addChild((self.touchNode)!)
-    
-//        self.powerUp(type: 10);
-//        self.powerUp(type: 11);
     }
     
     //TOUCH COMANDS
@@ -215,21 +220,64 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
     }
     
+    func handlePause(){
+        self.isPaused = true;
+        restartNode?.isHidden = false;
+        homeNode?.isHidden = false;
+        highScoreLabel.isHidden = false;
+    }
+    
+    func handleUnpause(){
+        self.isPaused = false;
+        restartNode?.isHidden = true;
+        homeNode?.isHidden = true;
+        highScoreLabel.isHidden = true;
+    }
     
     //TOUCH HANDLERS
     func touchStartHandler(touch: UITouch) {
         let point = touch.location(in: UIOverlay)
+        let touchedNode = UIOverlay.atPoint(point)
+        
+        if(self.isPaused){
+            if(touchedNode.name == "restartNode"){
+                let scene = GameScene(size: CGSize(width: 1250, height: 2800));
+                scene.scaleMode = .aspectFill
+                if let view = self.view{
+                    view.presentScene(scene)
+                    view.ignoresSiblingOrder = true
+                    view.showsFPS = false
+                    view.showsPhysics = false
+                    view.showsNodeCount = false
+                }
+            } else if(touchedNode.name == "homeNode"){
+                let scene = MainMenu();
+                if let view = self.view {
+                    view.presentScene(scene)
+                }
+            } else if (self.health > 0){
+                handleUnpause();
+                return;
+            }
+        }
+        
+        if(touchedNode.name == "pauseNode"){
+            handlePause();
+            return;
+        }
+        
         if(point.y > 200){
             if(touchNode?.isHidden == true){
                 touchNode?.isHidden = false;
                 touchNode?.position = point
             }
         } else {
-            let touchedNode = UIOverlay.atPoint(point)
-            if(touchedNode.name == "Turret" || touchedNode.name == "Slide"){
-                for tur in turrets {
-                    tur.activateSupercharge();
-                }
+            if(touchedNode.name == "Turret"){
+                let temp = touchedNode as! Turret
+                temp.activateSupercharge();
+            } else if(touchedNode.name == "Slide"){
+                let temp = touchedNode.parent as! Turret
+                temp.activateSupercharge();
             }
         }
     }
@@ -301,28 +349,36 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     func didTakeDmg(_ dmg: Int){
         self.health = self.health - dmg;
         self.healthLabel.text = String(self.health)
+        if(self.health <= 0){
+            gameOver();
+        }
     }
     
     func enemyDestroyed(node: SKNode, points: Int){
         self.score += points;
+        self.chargeCounter += points;
+        if(self.chargeCounter >= 5000){
+            self.health += 1
+            self.healthLabel.text = String(self.health)
+            for tur in turrets {
+                tur.supercharge();
+            }
+            self.chargeCounter = 0;
+            createTextParticle(text: "Supercharge Ready", position: CGPoint(x: 0, y: screenSize!.height - 600), color: UIColor.yellow);
+        }
         self.scoreLabel.text = String(score);
         
-        //lifesteal
-        let bonus: Int = Int(CGFloat(points) * lifesteal);
-        if(bonus + health < maxHealth){
-            health += bonus;
-        } else {
-            health = maxHealth
-        }
-        self.healthLabel.text = String(health);
         
         let f = spawner?.convert(node.position, to: ParticleOverlay);
-        
-        
         if let wrap = explosionEmitters?.getNext() {
             let wrapEmit = wrap as! SKEmitterWrapper;
             wrapEmit.position = f!;
             wrapEmit.Emitter?.resetSimulation();
+            if(node.name == "SuicideBomber") {
+                wrapEmit.run(SoundMaster.explosionHeavySound);
+            } else {
+                wrapEmit.run(SoundMaster.explosionLightSound);
+            }
         }
         
         createTextParticle(text: String(points), position: f)
@@ -334,9 +390,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         if(type == 0){
             typeString = "Speed"
             color = UIColor.blue;
-            for tur in turrets {
-                tur.upgradeRoF();
-            }
         } else if (type == 1){
             typeString = "Damage"
             color = UIColor.red;
@@ -346,7 +399,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         } else if (type == 2){
             typeString = "Health"
             color = UIColor.green;
-            self.maxHealth += 10;
         } else if (type == 3){
             typeString = "Supercharge"
             for tur in turrets {
@@ -362,10 +414,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             turret2.position = CGPoint(x: 200, y: 100)
             UIOverlay.addChild(turret2)
             turrets.append(turret2)
-            
-            for tur in turrets {
-                tur.reset();
-            }
             
             //offset shots
             let timeBetweenShots = turrets[1].weapons[0].ROF / 60;
@@ -384,10 +432,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             UIOverlay.addChild(turret2)
             turrets.append(turret2)
             
-            for tur in turrets {
-                tur.reset();
-            }
-            
             let timeBetweenShots = turrets[1].weapons[0].ROF / 60;
             let myDelay = timeBetweenShots/3;
             turrets[1].weapons[0].readyDelay = Double(myDelay)
@@ -400,6 +444,22 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
         
         createTextParticle(text: "+"+typeString, position: CGPoint(x: 0, y: screenSize!.height - 600), color: color);
+    }
+    
+    func gameOver(){
+        createTextParticle(text: "GAME OVER", position: CGPoint(x: 0, y: screenSize!.height - 600), color: UIColor.red, duration: 5.0);
+        self.isPaused = true;
+        self.restartNode?.isHidden = false;
+        self.homeNode?.isHidden = false;
+        
+        let defaults = UserDefaults.standard;
+        let hs = defaults.integer(forKey: "SpaceAidsHighScore") as Int;
+    
+        if(score > hs){
+            defaults.set(score, forKey: "SpaceAidsHighScore")
+            highScoreLabel.text = "New High Score!"
+            highScoreLabel.isHidden = false;
+        }
     }
     
     //update funcs
@@ -419,14 +479,25 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 checkSpawn = true;
             } else { //end of level, go to next
                 level += 1;
+                
+                if(level == 5){
+                    self.powerUp(type: 10)
+                }
+                if(level == 8){
+                    self.powerUp(type: 11)
+                }
+                if(level == 9){
+                    createTextParticle(text: "Good luck", position: CGPoint(x: 0, y: screenSize!.height - 600), duration: 3.0, fontSize: 90)
+                }
+                if(level == 13){
+                    createTextParticle(text: "Still alive eh?...", position: CGPoint(x: 0, y: screenSize!.height - 600), duration: 3.0, fontSize: 90)
+                    self.spawner?.bogus1();
+                }
                 let didLoad = spawner!.loadLevel("level_"+String(level));
                 if(didLoad){
                     createTextParticle(text: "LEVEL "+String(level), position: nil, duration: 3.0, fontSize: 90)
                     self.lastSpawned = currentTime;
                     self.spawnDelay = 3.5;
-                    
-//                    self.powerUp(type: 10)
-//                    self.powerUp(type: 11)
                     
                     checkSpawn = true;
                 } else {

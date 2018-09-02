@@ -19,6 +19,7 @@ class EnemyGenerator: SKNode, enemyWatchDelegate {
     var actions: [SKAction] = [SKAction]();
     var levelLines: [String] = [String]();
     var levelIndex:Int = 0;
+    var patterns: [String] = [String]();
     
     //enemy type, number of spawns, enemy hp, spawn path, speed, delay per spawn(ms), wave delay(ms)
     var testString = "1, 5, 5, 0, 8, 200, 3000"
@@ -26,18 +27,73 @@ class EnemyGenerator: SKNode, enemyWatchDelegate {
     init(position: CGPoint, horizontalRange: CGFloat){
         super.init();
         
-        let testNode = SKSpriteNode(color: UIColor.brown, size: CGSize(width: 50, height: 50))
-        self.addChild(testNode)
-        
         self.position = position; //put at top left...
         domain = horizontalRange;
         range = position.y + 100;
+        
+        patterns.append("1, 1, 12, 0, 200, 600");
+        patterns.append("1, 1, 12, 1, 200, 600");
+        patterns.append("1, 1, 12, 1, 200, 600");
+        patterns.append("2, 5, 2, 3, 800, 200");
+        patterns.append("2, 5, 2, 4, 800, 200");
+        patterns.append("2, 5, 2, 5, 800, 200");
+        patterns.append("2, 5, 2, 6, 800, 200");
+        patterns.append("3, 5, 2, 7, 800, 200");
+        patterns.append("3, 5, 2, 8, 800, 200");
+        patterns.append("3, 5, 2, 10, 800, 200");
+        patterns.append("3, 5, 2, 11, 800, 200");
+        patterns.append("10, 1, 50, 9, 100, 1000");
     }
 
+    func bogus1(){
+        patterns.removeAll();
+        patterns.append("1, 2, 12, 0, 200, 600");
+        patterns.append("1, 2, 12, 1, 200, 600");
+        patterns.append("1, 2, 12, 1, 200, 600");
+        patterns.append("2, 6, 2, 3, 800, 200");
+        patterns.append("2, 6, 2, 4, 800, 200");
+        patterns.append("2, 6, 2, 5, 800, 200");
+        patterns.append("2, 6, 2, 6, 800, 200");
+        patterns.append("3, 6, 2, 7, 800, 200");
+        patterns.append("3, 6, 2, 8, 800, 200");
+        patterns.append("3, 6, 2, 10, 800, 200");
+        patterns.append("3, 6, 2, 11, 800, 200");
+        patterns.append("10, 1, 50, 9, 100, 1000");
+    }
+    
+    func bogus2(){
+        patterns.removeAll();
+        patterns.append("1, 2, 12, 0, 300, 600");
+        patterns.append("1, 2, 12, 1, 300, 600");
+        patterns.append("1, 2, 12, 1, 300, 600");
+        patterns.append("2, 6, 2, 3, 1000, 200");
+        patterns.append("2, 6, 2, 4, 1000, 200");
+        patterns.append("2, 6, 2, 5, 1000, 200");
+        patterns.append("2, 6, 2, 6, 1000, 200");
+        patterns.append("3, 6, 2, 7, 1000, 200");
+        patterns.append("3, 6, 2, 8, 1000, 200");
+        patterns.append("3, 6, 2, 10, 1000, 200");
+        patterns.append("3, 6, 2, 11, 1000, 200");
+        patterns.append("10, 1, 50, 9, 100, 1000");
+    }
+    
+    func generateRandomLevel(){
+        var rngsus: Int;
+        levelLines.removeAll();
+        levelIndex = 0;
+        for _ in 0...16 {
+            rngsus = Int(arc4random_uniform(UInt32(patterns.count)));
+            var pick:String = patterns[rngsus];
+            pick += ", " + String(arc4random_uniform(2000));
+            self.levelLines.append(pick);
+        }
+        
+    }
     
     func loadLevel(_ filename: String)->Bool{
         guard let filepath = Bundle.main.path(forResource: filename, ofType: "csv") else {
-            return false;
+            generateRandomLevel();
+            return true;
         }
         
         do {
@@ -174,6 +230,27 @@ class EnemyGenerator: SKNode, enemyWatchDelegate {
         bossLoop.addLine(to: CGPoint(x: domain/2, y: -range/3));
         bossLoop.addLine(to: CGPoint(x: domain/2, y: -range));
         paths.append(bossLoop.cgPath);
+        
+        //10 - right crazy loop
+        let czLoop = UIBezierPath()
+        czLoop.move(to: CGPoint(x: domain - 100, y: 0))
+        czLoop.addLine(to: loopStart);
+        czLoop.addArc(withCenter: CGPoint(x: lstartX - radius, y: loopStart.y), radius: radius, startAngle: 0, endAngle:CGFloat.pi*2, clockwise: true)
+        czLoop.addLine(to: CGPoint(x: lstartX, y: -range))
+        paths.append(czLoop.cgPath)
+        
+        //11 - left crazy loop
+        lstartX = 100
+        loopStart = CGPoint(x: lstartX, y: -(range/3));
+        
+        
+        let lzLoop = UIBezierPath()
+        lzLoop.move(to: CGPoint(x: lstartX, y: 0))
+        lzLoop.addLine(to: loopStart);
+        lzLoop.addArc(withCenter: CGPoint(x: lstartX + radius, y: loopStart.y), radius: radius, startAngle: CGFloat.pi*2, endAngle:0, clockwise: true)
+        lzLoop.addLine(to: CGPoint(x: lstartX, y: -range))
+        paths.append(lzLoop.cgPath)
+        
     }
     
     func spawnWave()->TimeInterval{
@@ -184,7 +261,7 @@ class EnemyGenerator: SKNode, enemyWatchDelegate {
         
         let replacedString = String(input.filter {$0 != " "});
         let p = replacedString.split(separator: ",", omittingEmptySubsequences: true)
-        let arr: [Int] = p.flatMap { Int($0) }
+        let arr: [Int] = p.compactMap{ Int($0) }
         
         let type: Int = arr[0]
         let count: Int = arr[1]
