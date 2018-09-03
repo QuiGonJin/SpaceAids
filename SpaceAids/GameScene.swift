@@ -36,9 +36,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var homeNode: SKSpriteNode?
     var backgroundNode: SKSpriteNode?
     
+    //max 2 fingers, 1 for target 1 for some other UI
+    var targetTouch: String? = nil;
+    var selectorTouch: String? = nil;
+    
     //Particles
     var ParticleOverlay: SKNode = SKNode();
-    
     var projectileEmitters: NodeCollection?;
     var explosionEmitters: NodeCollection?;
     var criticalEmitters : NodeCollection?;
@@ -156,7 +159,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         self.spawner?.initPaths();
         self.addChild(spawner!);
         
-        
         //labels
         scoreLabel.text = String(self.score)
         scoreLabel.fontName = "HelveticaNeue"
@@ -202,7 +204,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         //Controls
         self.touchNode = SKNode()
         self.touchNode?.name = "touchNode"
-        self.touchNode?.isHidden = true
         self.touchNode?.position = CGPoint(x: 0, y: 0)
         self.UIOverlay.addChild((self.touchNode)!)
     }
@@ -229,6 +230,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
     }
     
+    //TOUCH HANDLERS
     func handlePause(){
         self.isPaused = true;
         restartNode?.isHidden = false;
@@ -243,7 +245,34 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         highScoreLabel.isHidden = true;
     }
     
-    //TOUCH HANDLERS
+    func targetTouchDidStart(touch: UITouch){
+        if(targetTouch == nil){
+            let point = touch.location(in: UIOverlay);
+            targetTouch = String(format: "%p", touch);
+            touchNode?.position = point;
+            var percent = (point.x / (screenSize?.width)! / 2) * point.x / 2;
+            if(point.x > 0){
+                percent = percent * -1;
+            }
+            parallaxMoveTo(x: percent);
+        }
+    }
+    
+    func selectorTouchDidStart(touch: UITouch){
+        if(selectorTouch == nil){
+            let point = touch.location(in: UIOverlay);
+            let touchedNode = UIOverlay.atPoint(point);
+            selectorTouch = String(format: "%p", touch);
+            if(touchedNode.name == "Turret"){
+                let temp = touchedNode as! Turret
+                temp.activateSupercharge();
+            } else if(touchedNode.name == "Slide"){
+                let temp = touchedNode.parent as! Turret
+                temp.activateSupercharge();
+            }
+        }
+    }
+    
     func touchStartHandler(touch: UITouch) {
         let point = touch.location(in: UIOverlay)
         let touchedNode = UIOverlay.atPoint(point)
@@ -276,29 +305,14 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
         
         if(point.y > 200){
-            if(touchNode?.isHidden == true){
-                touchNode?.isHidden = false;
-                touchNode?.position = point
-                
-                var percent = (point.x / (screenSize?.width)! / 2) * point.x / 2;
-                if(point.x > 0){
-                    percent = percent * -1;
-                }
-                parallaxMoveTo(x: percent);
-            }
+            targetTouchDidStart(touch: touch);
         } else {
-            if(touchedNode.name == "Turret"){
-                let temp = touchedNode as! Turret
-                temp.activateSupercharge();
-            } else if(touchedNode.name == "Slide"){
-                let temp = touchedNode.parent as! Turret
-                temp.activateSupercharge();
-            }
+            selectorTouchDidStart(touch: touch);
         }
     }
     
     func touchMoveHandler(touch: UITouch) {
-        if(touchNode?.isHidden == false){
+        if(targetTouch != nil && (String(format: "%p", touch) == targetTouch)){
             let point = touch.location(in: UIOverlay)
             touchNode?.position = point
             parallax(point: point)
@@ -327,8 +341,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     func touchReleaseHandler(touch: UITouch){
-        if(touchNode?.isHidden == false){
-            touchNode?.isHidden = true;
+        let name = String(format: "%p", touch);
+        if(selectorTouch != nil && (name == selectorTouch)){
+            selectorTouch = nil;
+        } else
+        if(targetTouch != nil && (name == targetTouch)){
+            targetTouch = nil;
             parallaxMoveTo(x: 0);
         }
     }
@@ -402,8 +420,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         self.score += points;
         self.chargeCounter += points;
         if(self.chargeCounter >= 5000){
-            self.health += 1
-            self.healthLabel.text = String(self.health)
             for tur in turrets {
                 tur.supercharge();
             }
@@ -411,7 +427,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             createTextParticle(text: "Supercharge Ready", position: CGPoint(x: 0, y: screenSize!.height - 600), color: UIColor.yellow);
         }
         self.scoreLabel.text = String(score);
-        
         
         let f = spawner?.convert(node.position, to: ParticleOverlay);
         if let wrap = explosionEmitters?.getNext() {
@@ -485,8 +500,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             turrets[2].weapons[1].readyDelay = Double(myDelay*2)
             
         }
-        
-        
         createTextParticle(text: "+"+typeString, position: CGPoint(x: 0, y: screenSize!.height - 600), color: color);
     }
     
@@ -554,7 +567,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             }
         }
         
-        if(touchNode?.isHidden == false){
+        if(targetTouch != nil){
             fire()
         }
         
