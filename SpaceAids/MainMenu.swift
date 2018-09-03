@@ -22,35 +22,50 @@ class MainMenu: SKScene {
         fatalError("init(coder:) has not been implemented")
     }
     
-    override func didMove(to view: SKView) {
-        Assets.load();
+    func loadPage(){
         SoundMaster.load();
         
         self.backgroundColor = UIColor.black
         self.anchorPoint = CGPoint(x: 0.5, y: 0.5)
-        start = SKSpriteNode(color: UIColor.red, size: CGSize(width: 500, height: 200))
-        start?.position = CGPoint(x: 0, y: 100)
-        start?.name = "start"
         
+        //Banner
+        let banner = SKSpriteNode(texture: SKTexture(imageNamed: "space_aids_banner"));
+        banner.position = CGPoint(x: 0, y: 400);
+        self.addChild(banner);
+        
+        //Logo
+        
+        let logo = SKSpriteNode(texture: SKTexture(imageNamed: "kami_kazo_logo"));
+        logo.position = CGPoint(x: 450, y: -1000);
+        self.addChild(logo);
+        
+        //High Score
         let defaults = UserDefaults.standard;
         let hs = defaults.integer(forKey: "SpaceAidsHighScore") as Int;
         
-        if(hs > 0){
-            scoreLabelLabel = SKLabelNode(text: "High Score");
-            scoreLabelLabel?.fontColor = UIColor.white;
-            scoreLabelLabel?.fontSize = 90;
-            scoreLabelLabel?.position = CGPoint(x: 0, y: -200)
-            
-            scoreLabel = SKLabelNode(text: String(hs));
-            scoreLabel?.fontColor = UIColor.white;
-            scoreLabel?.fontSize = 60;
-            scoreLabel?.position = CGPoint(x: 0, y: -300);
-            
-            self.addChild(scoreLabelLabel!);
-            self.addChild(scoreLabel!);
-        }
-
+        scoreLabelLabel = SKLabelNode(text: "High Score");
+        scoreLabelLabel?.fontColor = UIColor.white;
+        scoreLabelLabel?.fontSize = 90;
+        scoreLabelLabel?.position = CGPoint(x: 0, y: 0)
+        
+        scoreLabel = SKLabelNode(text: String(hs));
+        scoreLabel?.fontColor = UIColor.white;
+        scoreLabel?.fontSize = 60;
+        scoreLabel?.position = CGPoint(x: 0, y: -100);
+        
+        self.addChild(scoreLabelLabel!);
+        self.addChild(scoreLabel!);
+        
+        //Start Button
+        start = SKSpriteNode(texture: SKTexture(imageNamed: "start_button"));
+        start?.position = CGPoint(x: 0, y: -500)
+        start?.name = "start"
+        
         self.addChild(start!)
+    }
+    
+    override func didMove(to view: SKView) {
+        Assets.load(completion: loadPage);
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -66,12 +81,8 @@ class MainMenu: SKScene {
     
     
     func launchGame() {
-//        let sizeRect = UIScreen.main.nativeBounds
-//        let width = sizeRect.size.width * UIScreen.main.nativeScale
-//        let height = sizeRect.size.height * UIScreen.main.nativeScale
-//        let scene = GameScene(size: CGSize(width: width, height: height));
-        
         let scene = GameScene(size: CGSize(width: 1250, height: 2800));
+        scene.run(SoundMaster.swapWeaponSound);
         scene.scaleMode = .aspectFill
         if let view = self.view{
             view.presentScene(scene)

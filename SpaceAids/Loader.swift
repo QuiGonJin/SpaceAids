@@ -17,11 +17,29 @@ class Assets {
     static var suicideSprites: [SKTexture] = [SKTexture]();
     static var lilBasterdSprites: [SKTexture] = [SKTexture]();
     static var fighterSprites: [SKTexture] = [SKTexture]();
+    static var BottomBarSprite: SKTexture = SKTexture();
+    static var PauseIconSprite: SKTexture = SKTexture();
+    static var HomeIconSprite: SKTexture  = SKTexture();
+    static var RestartIconSprite: SKTexture = SKTexture();
+    static var TurretSprite: SKTexture = SKTexture();
+    static var SlideSprite: SKTexture = SKTexture();
+    static var Background: SKTexture = SKTexture();
     
 //    static var muzzleSprites: SKTextureAtlas = SKTextureAtlas();
     
     //blocking load
-    static func load() {
+    static func load(completion : () -> Void) {
+        //UI
+        BottomBarSprite = SKTexture(imageNamed: "bottom_bar");
+        PauseIconSprite = SKTexture(imageNamed: "pause_icon");
+        HomeIconSprite = SKTexture(imageNamed: "home_icon");
+        RestartIconSprite = SKTexture(imageNamed: "restart_icon");
+        Background = SKTexture(imageNamed: "background");
+        
+        //Turret
+        TurretSprite = SKTexture(imageNamed: "turret_sprite");
+        SlideSprite = SKTexture(imageNamed: "turret_slide");
+        
         //bullets
         let hs1 = SKTexture(imageNamed: "bullet_sprite_1");
         bulletSprites.append(hs1);
@@ -54,5 +72,6 @@ class Assets {
             fighterSprites.append(fighterAtlas.textureNamed(sp))
         }
         
+        completion();
     }
 }

@@ -30,10 +30,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var scoreLabel: SKLabelNode = SKLabelNode();
     var highScoreLabel : SKLabelNode = SKLabelNode();
     var healthLabel: SKLabelNode = SKLabelNode();
-    var touchNode : SKSpriteNode?
+    var touchNode : SKNode?
     var pauseNode : SKSpriteNode?
     var restartNode: SKSpriteNode?
     var homeNode: SKSpriteNode?
+    var backgroundNode: SKSpriteNode?
     
     //Particles
     var ParticleOverlay: SKNode = SKNode();
@@ -62,6 +63,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         super.init(size: CGSize(width: size.width, height: size.height))
         self.physicsWorld.gravity = CGVector(dx: 0, dy: 0);
         self.physicsWorld.contactDelegate = self
+        self.backgroundColor = UIColor.black;
         mainScene = self
     }
     
@@ -81,6 +83,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         self.addChild(self.cam!)
         self.camera?.position = CGPoint(x: 0, y: (screenSize?.height)!/2)
         
+        //background
+        backgroundNode = SKSpriteNode(texture: Assets.Background);
+        backgroundNode?.anchorPoint = CGPoint(x: 0.5, y: 0);
+        backgroundNode?.position = CGPoint(x: 0, y: 0);
+        backgroundNode?.zPosition = -1
+        self.addChild(backgroundNode!);
+        
         //UIOverlay
         let w = (screenSize?.width)!
         let h = (screenSize?.height)!
@@ -94,7 +103,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         self.ParticleOverlay.zPosition = 2
         self.addChild(ParticleOverlay)
         
-        let bottomBar = SKSpriteNode(texture: nil, color: UIColor.gray, size: CGSize(width: (self.screenSize?.width)!, height: 200))
+        let bottomBar = SKSpriteNode(texture: Assets.BottomBarSprite, color: UIColor.gray, size: CGSize(width: (self.screenSize?.width)!, height: 200))
         bottomBar.position = CGPoint(x: 0, y: 100)
         bottomBar.physicsBody = SKPhysicsBody(rectangleOf: bottomBar.size)
         bottomBar.physicsBody?.affectedByGravity = false
@@ -172,26 +181,26 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         healthLabel.zPosition = 5
         UIOverlay.addChild(healthLabel)
         
-        pauseNode = SKSpriteNode(color: UIColor.yellow, size: CGSize(width: 120, height: 120))
+        pauseNode = SKSpriteNode(texture: Assets.PauseIconSprite);
         pauseNode?.name = "pauseNode"
-        pauseNode?.position = CGPoint(x: -w/2 + 60, y: h - 60)
+        pauseNode?.position = CGPoint(x: -w/2 + 100, y: h - 100)
         UIOverlay.addChild((pauseNode)!)
         
-        restartNode = SKSpriteNode(color: UIColor.green, size: CGSize(width: 120, height: 120))
+        restartNode = SKSpriteNode(texture: Assets.RestartIconSprite);
         restartNode?.name = "restartNode"
-        restartNode?.position = CGPoint(x: -w/2 + 180, y: h - 60)
+        restartNode?.position = CGPoint(x: -w/2 + 100, y: h - 220)
         restartNode?.isHidden = true;
         UIOverlay.addChild((restartNode)!)
         
-        homeNode = SKSpriteNode(color: UIColor.blue, size: CGSize(width: 120, height: 120))
+        homeNode = SKSpriteNode(texture: Assets.HomeIconSprite);
         homeNode?.name = "homeNode"
-        homeNode?.position = CGPoint(x: -w/2 + 300, y: h - 60)
+        homeNode?.position = CGPoint(x: -w/2 + 100, y: h - 340)
         homeNode?.isHidden = true;
         UIOverlay.addChild((homeNode)!)
         
         
         //Controls
-        self.touchNode = SKSpriteNode(color: UIColor.blue, size: CGSize(width: 50, height: 50))
+        self.touchNode = SKNode()
         self.touchNode?.name = "touchNode"
         self.touchNode?.isHidden = true
         self.touchNode?.position = CGPoint(x: 0, y: 0)
@@ -270,6 +279,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             if(touchNode?.isHidden == true){
                 touchNode?.isHidden = false;
                 touchNode?.position = point
+                
+                var percent = (point.x / (screenSize?.width)! / 2) * point.x / 2;
+                if(point.x > 0){
+                    percent = percent * -1;
+                }
+                parallaxMoveTo(x: percent);
             }
         } else {
             if(touchedNode.name == "Turret"){
@@ -286,12 +301,35 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         if(touchNode?.isHidden == false){
             let point = touch.location(in: UIOverlay)
             touchNode?.position = point
+            parallax(point: point)
         }
+    }
+    
+    func parallax(point: CGPoint){
+        if((backgroundNode?.hasActions) != nil){
+            backgroundNode?.removeAllActions();
+        }
+        var percent = (point.x / (screenSize?.width)! / 2) * point.x / 2;
+        if(point.x > 0){
+            percent = percent * -1;
+        }
+        
+        backgroundNode?.position.x = percent;
+    }
+    
+    func parallaxMoveTo(x: CGFloat){
+        if((backgroundNode?.hasActions) != nil){
+            backgroundNode?.removeAllActions();
+        }
+        let action = SKAction.moveTo(x: x, duration: 0.2);
+        
+        backgroundNode?.run(action);
     }
     
     func touchReleaseHandler(touch: UITouch){
         if(touchNode?.isHidden == false){
             touchNode?.isHidden = true;
+            parallaxMoveTo(x: 0);
         }
     }
     
@@ -340,13 +378,19 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     //DELEGATES
     func didBegin(_ contact: SKPhysicsContact) {
         if let enemy =  contact.bodyA.node as? enemy {
-            didTakeDmg(enemy.suicide())
+            didTakeDmg(enemy.suicide(), contact: contact.contactPoint)
         } else if let enemy = contact.bodyB.node as? enemy{
-            didTakeDmg(enemy.suicide())
+            didTakeDmg(enemy.suicide(), contact: contact.contactPoint)
         }
     }
     
-    func didTakeDmg(_ dmg: Int){
+    func didTakeDmg(_ dmg: Int, contact: CGPoint){
+        if let wrap = explosionEmitters?.getNext() {
+            let wrapEmit = wrap as! SKEmitterWrapper;
+            wrapEmit.position = contact;
+            wrapEmit.Emitter?.resetSimulation();
+            self.run(SoundMaster.getDamagedSound());
+        }
         self.health = self.health - dmg;
         self.healthLabel.text = String(self.health)
         if(self.health <= 0){
@@ -492,6 +536,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 if(level == 13){
                     createTextParticle(text: "Still alive eh?...", position: CGPoint(x: 0, y: screenSize!.height - 600), duration: 3.0, fontSize: 90)
                     self.spawner?.bogus1();
+                }
+                if(level == 20){
+                    createTextParticle(text: "RIP", position: CGPoint(x: 0, y: screenSize!.height - 600), duration: 3.0, fontSize: 90)
+                    self.spawner?.bogus2();
                 }
                 let didLoad = spawner!.loadLevel("level_"+String(level));
                 if(didLoad){

@@ -50,31 +50,31 @@ class EnemyGenerator: SKNode, enemyWatchDelegate {
         patterns.append("1, 2, 12, 0, 200, 600");
         patterns.append("1, 2, 12, 1, 200, 600");
         patterns.append("1, 2, 12, 1, 200, 600");
-        patterns.append("2, 6, 2, 3, 800, 200");
-        patterns.append("2, 6, 2, 4, 800, 200");
-        patterns.append("2, 6, 2, 5, 800, 200");
-        patterns.append("2, 6, 2, 6, 800, 200");
-        patterns.append("3, 6, 2, 7, 800, 200");
-        patterns.append("3, 6, 2, 8, 800, 200");
-        patterns.append("3, 6, 2, 10, 800, 200");
-        patterns.append("3, 6, 2, 11, 800, 200");
-        patterns.append("10, 1, 50, 9, 100, 1000");
+        patterns.append("2, 8, 2, 3, 800, 200");
+        patterns.append("2, 8, 2, 4, 800, 200");
+        patterns.append("2, 8, 2, 5, 800, 200");
+        patterns.append("2, 8, 2, 6, 800, 200");
+        patterns.append("3, 8, 2, 7, 800, 200");
+        patterns.append("3, 8, 2, 8, 800, 200");
+        patterns.append("3, 8, 2, 10, 800, 200");
+        patterns.append("3, 8, 2, 11, 800, 200");
+        patterns.append("10, 1, 100, 9, 100, 1000");
     }
     
     func bogus2(){
         patterns.removeAll();
-        patterns.append("1, 2, 12, 0, 300, 600");
-        patterns.append("1, 2, 12, 1, 300, 600");
-        patterns.append("1, 2, 12, 1, 300, 600");
-        patterns.append("2, 6, 2, 3, 1000, 200");
-        patterns.append("2, 6, 2, 4, 1000, 200");
-        patterns.append("2, 6, 2, 5, 1000, 200");
-        patterns.append("2, 6, 2, 6, 1000, 200");
-        patterns.append("3, 6, 2, 7, 1000, 200");
-        patterns.append("3, 6, 2, 8, 1000, 200");
-        patterns.append("3, 6, 2, 10, 1000, 200");
-        patterns.append("3, 6, 2, 11, 1000, 200");
-        patterns.append("10, 1, 50, 9, 100, 1000");
+        patterns.append("1, 2, 18, 0, 300, 600");
+        patterns.append("1, 2, 18, 1, 300, 600");
+        patterns.append("1, 2, 18, 1, 300, 600");
+        patterns.append("2, 10, 3, 3, 800, 200");
+        patterns.append("2, 10, 3, 4, 800, 200");
+        patterns.append("2, 10, 3, 5, 800, 200");
+        patterns.append("2, 10, 3, 6, 800, 200");
+        patterns.append("3, 10, 3, 7, 800, 200");
+        patterns.append("3, 10, 3, 8, 800, 200");
+        patterns.append("3, 10, 3, 10, 800, 200");
+        patterns.append("3, 10, 3, 11, 800, 200");
+        patterns.append("10, 1, 150, 9, 100, 1000");
     }
     
     func generateRandomLevel(){

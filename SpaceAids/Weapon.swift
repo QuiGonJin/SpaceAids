@@ -43,9 +43,9 @@ class Turret: SKSpriteNode {
     }
     
     convenience init(scene: GameScene, size: CGSize){
-        self.init(texture: SKTexture(imageNamed:"turret_sprite"), color: UIColor.clear, size: size);
+        self.init(texture: Assets.TurretSprite, size: size);
 
-        slide = SKSpriteNode(texture: SKTexture(imageNamed:"turret_slide"), color: UIColor.clear, size: size);
+        slide = SKSpriteNode(texture: Assets.SlideSprite, size: size);
         slide?.position = CGPoint(x: 0, y: 0);
         slide?.zPosition = 1;
         slide?.name = "Slide";
