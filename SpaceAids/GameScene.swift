@@ -34,8 +34,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var pauseNode : SKSpriteNode?
     var restartNode: SKSpriteNode?
     var homeNode: SKSpriteNode?
+    var bgmSoundNode: SKNode?
     var backgroundNode: SKSpriteNode?
-    
+
     //max 2 fingers, 1 for target 1 for some other UI
     var targetTouch: String? = nil;
     var selectorTouch: String? = nil;
@@ -199,14 +200,17 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         homeNode?.position = CGPoint(x: -w/2 + 100, y: h - 340)
         homeNode?.isHidden = true;
         UIOverlay.addChild((homeNode)!)
-        
+
         
         //Controls
         self.touchNode = SKNode()
         self.touchNode?.name = "touchNode"
         self.touchNode?.position = CGPoint(x: 0, y: 0)
         self.UIOverlay.addChild((self.touchNode)!)
+
+        self.addChild(SoundMaster.bgmPlayer);
     }
+    
     
     //TOUCH COMANDS
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -279,6 +283,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
         if(self.isPaused){
             if(touchedNode.name == "restartNode"){
+                self.removeAllChildren();
+                self.removeAllActions();
+                mainScene = nil;
                 let scene = GameScene(size: CGSize(width: 1250, height: 2800));
                 scene.scaleMode = .aspectFill
                 if let view = self.view{
@@ -289,6 +296,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                     view.showsNodeCount = false
                 }
             } else if(touchedNode.name == "homeNode"){
+                self.removeAllChildren();
                 let scene = MainMenu();
                 if let view = self.view {
                     view.presentScene(scene)
@@ -508,6 +516,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         self.isPaused = true;
         self.restartNode?.isHidden = false;
         self.homeNode?.isHidden = false;
+//        self.bgmNode?.isHidden = false;
         
         let defaults = UserDefaults.standard;
         let hs = defaults.integer(forKey: "SpaceAidsHighScore") as Int;
@@ -547,12 +556,16 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                     createTextParticle(text: "Good luck", position: CGPoint(x: 0, y: screenSize!.height - 600), duration: 3.0, fontSize: 90)
                 }
                 if(level == 13){
-                    createTextParticle(text: "Still alive eh?...", position: CGPoint(x: 0, y: screenSize!.height - 600), duration: 3.0, fontSize: 90)
+                    createTextParticle(text: "Your enemies grow stronger", position: CGPoint(x: 0, y: screenSize!.height - 600), duration: 3.0, fontSize: 90)
                     self.spawner?.bogus1();
                 }
                 if(level == 20){
-                    createTextParticle(text: "RIP", position: CGPoint(x: 0, y: screenSize!.height - 600), duration: 3.0, fontSize: 90)
+                    createTextParticle(text: "Your enemies grow stronger", position: CGPoint(x: 0, y: screenSize!.height - 600), duration: 3.0, fontSize: 90)
                     self.spawner?.bogus2();
+                }
+                if(level == 25){
+                    createTextParticle(text: "Omae wa mou shindeiru", position: CGPoint(x: 0, y: screenSize!.height - 600), duration: 3.0, fontSize: 90)
+                    self.spawner?.bogus3();
                 }
                 let didLoad = spawner!.loadLevel("level_"+String(level));
                 if(didLoad){

@@ -17,8 +17,10 @@ class SoundMaster {
     static var explosionHeavySound = SKAction();
     static var swapWeaponSound = SKAction();
     static var didTakeDmgSound = SKAction();
+    static var bgmSound = SKAction();
+    static var bgmPlayer = SKAudioNode();
     
-    static func load() {
+    static func load(completion : () -> Void) {
         for i in 1...5{
             let filename:String = "gun_sound_" + String(i)
             gunSounds.append(SKAction.playSoundFileNamed(filename, waitForCompletion: false));
@@ -30,6 +32,10 @@ class SoundMaster {
         explosionHeavySound = SKAction.playSoundFileNamed("explosion_heavy", waitForCompletion: false);
         swapWeaponSound = SKAction.playSoundFileNamed("switch_weapon", waitForCompletion: false);
         didTakeDmgSound = SKAction.playSoundFileNamed("damaged_sound", waitForCompletion: false);
+        bgmSound = SKAction.playSoundFileNamed("bgm", waitForCompletion: true);
+        bgmPlayer = SKAudioNode(fileNamed: "bgm");
+        bgmPlayer.autoplayLooped = true;
+        completion();
     }
     
     static func getGunSound() -> SKAction {

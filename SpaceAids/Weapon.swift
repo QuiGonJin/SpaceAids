@@ -44,10 +44,10 @@ class Turret: SKSpriteNode {
     
     convenience init(scene: GameScene, size: CGSize){
         self.init(texture: Assets.TurretSprite, size: size);
-
+        self.zPosition = 1;
         slide = SKSpriteNode(texture: Assets.SlideSprite, size: size);
         slide?.position = CGPoint(x: 0, y: 0);
-        slide?.zPosition = 1;
+        slide?.zPosition = 2;
         slide?.name = "Slide";
         self.addChild(slide!);
         
@@ -61,7 +61,7 @@ class Turret: SKSpriteNode {
         for i in 0..<Assets.muzzleSprites.count {
             let HS = SKSpriteNode(texture : Assets.muzzleSprites[i]);
 
-            HS.zPosition = 2;
+            HS.zPosition = 3;
             HS.anchorPoint = CGPoint(x: 0.5, y: 0)
             HS.position = self.position;
             HS.isHidden = true;
@@ -376,7 +376,7 @@ class Magnum: weapon {
         self.ammo = self.magazineSize
         self.turret = turret
         //init sprites
-        let HS3: SKSpriteNode = SKSpriteNode(color: UIColor.cyan, size: CGSize(width: 20, height: 3000));
+        let HS3: SKSpriteNode = SKSpriteNode(color: UIColor.green, size: CGSize(width: 20, height: 3000));
         
         var hitscanSprites = [SKSpriteNode]();
         

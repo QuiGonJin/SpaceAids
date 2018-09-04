@@ -74,7 +74,24 @@ class EnemyGenerator: SKNode, enemyWatchDelegate {
         patterns.append("3, 10, 3, 8, 800, 200");
         patterns.append("3, 10, 3, 10, 800, 200");
         patterns.append("3, 10, 3, 11, 800, 200");
-        patterns.append("10, 1, 150, 9, 100, 1000");
+        patterns.append("10, 1, 200, 9, 100, 1000");
+    }
+    
+    func bogus3(){
+        patterns.removeAll();
+        patterns.append("1, 2, 20, 1, 300, 600");
+        patterns.append("1, 2, 20, 1, 300, 600");
+        patterns.append("2, 10, 3, 3, 800, 200");
+        patterns.append("2, 10, 3, 4, 800, 200");
+        patterns.append("2, 10, 3, 5, 800, 200");
+        patterns.append("2, 10, 3, 6, 800, 200");
+        patterns.append("3, 10, 3, 7, 800, 200");
+        patterns.append("3, 10, 3, 8, 800, 200");
+        patterns.append("3, 10, 3, 10, 800, 200");
+        patterns.append("3, 10, 3, 11, 800, 200");
+        patterns.append("10, 1, 150, 7, 500, 1000");
+        patterns.append("10, 1, 150, 8, 500, 1000");
+        patterns.append("10, 1, 200, 9, 100, 1000");
     }
     
     func generateRandomLevel(){

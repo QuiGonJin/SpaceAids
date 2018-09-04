@@ -10,7 +10,6 @@
 		E21A793C2054FBA4006E9BFD /* Util.swift in Sources */ = {isa = PBXBuildFile; fileRef = E21A793B2054FBA4006E9BFD /* Util.swift */; };
 		E260211A208C5B81003FAFB9 /* level_8.csv in Resources */ = {isa = PBXBuildFile; fileRef = E2602119208C5B81003FAFB9 /* level_8.csv */; };
 		E2602121213BD743003FAFB9 /* Supercharge.sks in Resources */ = {isa = PBXBuildFile; fileRef = E260211F213BD743003FAFB9 /* Supercharge.sks */; };
-		E2602129213CF9B8003FAFB9 /* crit_sound.wav in Resources */ = {isa = PBXBuildFile; fileRef = E2602126213CF9B7003FAFB9 /* crit_sound.wav */; };
 		E260212A213CF9B8003FAFB9 /* damaged_sound.wav in Resources */ = {isa = PBXBuildFile; fileRef = E2602127213CF9B7003FAFB9 /* damaged_sound.wav */; };
 		E260212B213CF9B8003FAFB9 /* armor_sound.wav in Resources */ = {isa = PBXBuildFile; fileRef = E2602128213CF9B7003FAFB9 /* armor_sound.wav */; };
 		E26BB8DB2009E07C00B5A4B7 /* SoundMaster.swift in Sources */ = {isa = PBXBuildFile; fileRef = E26BB8DA2009E07C00B5A4B7 /* SoundMaster.swift */; };
@@ -25,11 +24,6 @@
 		E2912F442079D1E800CBC298 /* HitParticle.sks in Resources */ = {isa = PBXBuildFile; fileRef = E2912F422079D1E800CBC298 /* HitParticle.sks */; };
 		E2912F452079D1E800CBC298 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E2912F432079D1E800CBC298 /* Assets.xcassets */; };
 		E2912F47207A251800CBC298 /* CritParticle.sks in Resources */ = {isa = PBXBuildFile; fileRef = E2912F46207A251800CBC298 /* CritParticle.sks */; };
-		E2912F67207C879F00CBC298 /* gun_sound_2.wav in Resources */ = {isa = PBXBuildFile; fileRef = E2912F62207C879E00CBC298 /* gun_sound_2.wav */; };
-		E2912F68207C879F00CBC298 /* gun_sound_3.wav in Resources */ = {isa = PBXBuildFile; fileRef = E2912F63207C879E00CBC298 /* gun_sound_3.wav */; };
-		E2912F69207C879F00CBC298 /* gun_sound_1.wav in Resources */ = {isa = PBXBuildFile; fileRef = E2912F64207C879E00CBC298 /* gun_sound_1.wav */; };
-		E2912F6A207C879F00CBC298 /* gun_sound_4.wav in Resources */ = {isa = PBXBuildFile; fileRef = E2912F65207C879F00CBC298 /* gun_sound_4.wav */; };
-		E2912F6B207C879F00CBC298 /* gun_sound_5.wav in Resources */ = {isa = PBXBuildFile; fileRef = E2912F66207C879F00CBC298 /* gun_sound_5.wav */; };
 		E2912F74207F2E7600CBC298 /* switch_weapon.wav in Resources */ = {isa = PBXBuildFile; fileRef = E2912F70207F2E7400CBC298 /* switch_weapon.wav */; };
 		E2912F75207F2E7600CBC298 /* explosion_heavy.wav in Resources */ = {isa = PBXBuildFile; fileRef = E2912F71207F2E7500CBC298 /* explosion_heavy.wav */; };
 		E2912F76207F2E7600CBC298 /* explosion_light.wav in Resources */ = {isa = PBXBuildFile; fileRef = E2912F72207F2E7500CBC298 /* explosion_light.wav */; };
@@ -45,6 +39,13 @@
 		E29C16D020033247002BAAF2 /* SpaceAidsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E29C16CF20033247002BAAF2 /* SpaceAidsTests.swift */; };
 		E29C16DB20033247002BAAF2 /* SpaceAidsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E29C16DA20033247002BAAF2 /* SpaceAidsUITests.swift */; };
 		E29C16E92003328F002BAAF2 /* MainMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = E29C16E82003328F002BAAF2 /* MainMenu.swift */; };
+		E29D3E7C213D497100C14A91 /* gun_sound_3.wav in Resources */ = {isa = PBXBuildFile; fileRef = E29D3E75213D496D00C14A91 /* gun_sound_3.wav */; };
+		E29D3E7D213D497100C14A91 /* crit_sound.wav in Resources */ = {isa = PBXBuildFile; fileRef = E29D3E76213D496E00C14A91 /* crit_sound.wav */; };
+		E29D3E7E213D497100C14A91 /* bgm.wav in Resources */ = {isa = PBXBuildFile; fileRef = E29D3E77213D496E00C14A91 /* bgm.wav */; };
+		E29D3E7F213D497100C14A91 /* gun_sound_4.wav in Resources */ = {isa = PBXBuildFile; fileRef = E29D3E78213D496F00C14A91 /* gun_sound_4.wav */; };
+		E29D3E80213D497100C14A91 /* gun_sound_2.wav in Resources */ = {isa = PBXBuildFile; fileRef = E29D3E79213D496F00C14A91 /* gun_sound_2.wav */; };
+		E29D3E81213D497100C14A91 /* gun_sound_1.wav in Resources */ = {isa = PBXBuildFile; fileRef = E29D3E7A213D497000C14A91 /* gun_sound_1.wav */; };
+		E29D3E82213D497100C14A91 /* gun_sound_5.wav in Resources */ = {isa = PBXBuildFile; fileRef = E29D3E7B213D497000C14A91 /* gun_sound_5.wav */; };
 		E2AFC15D20143AAB0045725A /* Enemy.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2AFC15C20143AAB0045725A /* Enemy.swift */; };
 		E2AFC15F202190560045725A /* Weapon.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2AFC15E202190560045725A /* Weapon.swift */; };
 		E2CE1D1D204684B700C7C7E8 /* EnemyGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2CE1D1C204684B700C7C7E8 /* EnemyGenerator.swift */; };
@@ -74,7 +75,6 @@
 		E21A793B2054FBA4006E9BFD /* Util.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Util.swift; sourceTree = "<group>"; };
 		E2602119208C5B81003FAFB9 /* level_8.csv */ = {isa = PBXFileReference; lastKnownFileType = text; path = level_8.csv; sourceTree = "<group>"; };
 		E260211F213BD743003FAFB9 /* Supercharge.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = Supercharge.sks; sourceTree = "<group>"; };
-		E2602126213CF9B7003FAFB9 /* crit_sound.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = crit_sound.wav; sourceTree = "<group>"; };
 		E2602127213CF9B7003FAFB9 /* damaged_sound.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = damaged_sound.wav; sourceTree = "<group>"; };
 		E2602128213CF9B7003FAFB9 /* armor_sound.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = armor_sound.wav; sourceTree = "<group>"; };
 		E26BB8DA2009E07C00B5A4B7 /* SoundMaster.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundMaster.swift; sourceTree = "<group>"; };
@@ -89,11 +89,6 @@
 		E2912F422079D1E800CBC298 /* HitParticle.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = HitParticle.sks; sourceTree = "<group>"; };
 		E2912F432079D1E800CBC298 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E2912F46207A251800CBC298 /* CritParticle.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = CritParticle.sks; sourceTree = "<group>"; };
-		E2912F62207C879E00CBC298 /* gun_sound_2.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = gun_sound_2.wav; sourceTree = "<group>"; };
-		E2912F63207C879E00CBC298 /* gun_sound_3.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = gun_sound_3.wav; sourceTree = "<group>"; };
-		E2912F64207C879E00CBC298 /* gun_sound_1.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = gun_sound_1.wav; sourceTree = "<group>"; };
-		E2912F65207C879F00CBC298 /* gun_sound_4.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = gun_sound_4.wav; sourceTree = "<group>"; };
-		E2912F66207C879F00CBC298 /* gun_sound_5.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = gun_sound_5.wav; sourceTree = "<group>"; };
 		E2912F70207F2E7400CBC298 /* switch_weapon.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = switch_weapon.wav; sourceTree = "<group>"; };
 		E2912F71207F2E7500CBC298 /* explosion_heavy.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = explosion_heavy.wav; sourceTree = "<group>"; };
 		E2912F72207F2E7500CBC298 /* explosion_light.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = explosion_light.wav; sourceTree = "<group>"; };
@@ -115,6 +110,13 @@
 		E29C16DA20033247002BAAF2 /* SpaceAidsUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpaceAidsUITests.swift; sourceTree = "<group>"; };
 		E29C16DC20033247002BAAF2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E29C16E82003328F002BAAF2 /* MainMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMenu.swift; sourceTree = "<group>"; };
+		E29D3E75213D496D00C14A91 /* gun_sound_3.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = gun_sound_3.wav; sourceTree = "<group>"; };
+		E29D3E76213D496E00C14A91 /* crit_sound.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = crit_sound.wav; sourceTree = "<group>"; };
+		E29D3E77213D496E00C14A91 /* bgm.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = bgm.wav; sourceTree = "<group>"; };
+		E29D3E78213D496F00C14A91 /* gun_sound_4.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = gun_sound_4.wav; sourceTree = "<group>"; };
+		E29D3E79213D496F00C14A91 /* gun_sound_2.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = gun_sound_2.wav; sourceTree = "<group>"; };
+		E29D3E7A213D497000C14A91 /* gun_sound_1.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = gun_sound_1.wav; sourceTree = "<group>"; };
+		E29D3E7B213D497000C14A91 /* gun_sound_5.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = gun_sound_5.wav; sourceTree = "<group>"; };
 		E2AFC15C20143AAB0045725A /* Enemy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Enemy.swift; sourceTree = "<group>"; };
 		E2AFC15E202190560045725A /* Weapon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Weapon.swift; sourceTree = "<group>"; };
 		E2CE1D1C204684B700C7C7E8 /* EnemyGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnemyGenerator.swift; sourceTree = "<group>"; };
@@ -151,18 +153,19 @@
 		E2912F48207B2D0F00CBC298 /* gun_sounds */ = {
 			isa = PBXGroup;
 			children = (
+				E29D3E77213D496E00C14A91 /* bgm.wav */,
+				E29D3E76213D496E00C14A91 /* crit_sound.wav */,
+				E29D3E7A213D497000C14A91 /* gun_sound_1.wav */,
+				E29D3E79213D496F00C14A91 /* gun_sound_2.wav */,
+				E29D3E75213D496D00C14A91 /* gun_sound_3.wav */,
+				E29D3E78213D496F00C14A91 /* gun_sound_4.wav */,
+				E29D3E7B213D497000C14A91 /* gun_sound_5.wav */,
 				E2602128213CF9B7003FAFB9 /* armor_sound.wav */,
-				E2602126213CF9B7003FAFB9 /* crit_sound.wav */,
 				E2602127213CF9B7003FAFB9 /* damaged_sound.wav */,
 				E2912F73207F2E7500CBC298 /* enemy_bullet_sound.wav */,
 				E2912F71207F2E7500CBC298 /* explosion_heavy.wav */,
 				E2912F72207F2E7500CBC298 /* explosion_light.wav */,
 				E2912F70207F2E7400CBC298 /* switch_weapon.wav */,
-				E2912F64207C879E00CBC298 /* gun_sound_1.wav */,
-				E2912F62207C879E00CBC298 /* gun_sound_2.wav */,
-				E2912F63207C879E00CBC298 /* gun_sound_3.wav */,
-				E2912F65207C879F00CBC298 /* gun_sound_4.wav */,
-				E2912F66207C879F00CBC298 /* gun_sound_5.wav */,
 			);
 			path = gun_sounds;
 			sourceTree = "<group>";
@@ -372,32 +375,33 @@
 				E2912F2F206788F100CBC298 /* level_5.csv in Resources */,
 				E2CE1D202047DC8500C7C7E8 /* level_1.csv in Resources */,
 				E2912F75207F2E7600CBC298 /* explosion_heavy.wav in Resources */,
-				E2602129213CF9B8003FAFB9 /* crit_sound.wav in Resources */,
 				E2912F452079D1E800CBC298 /* Assets.xcassets in Resources */,
-				E2912F68207C879F00CBC298 /* gun_sound_3.wav in Resources */,
 				E2912F79208084DE00CBC298 /* level_7.csv in Resources */,
 				E2912F47207A251800CBC298 /* CritParticle.sks in Resources */,
 				E2912F77207F2E7600CBC298 /* enemy_bullet_sound.wav in Resources */,
 				E29C16B720033247002BAAF2 /* GameScene.sks in Resources */,
-				E2912F6B207C879F00CBC298 /* gun_sound_5.wav in Resources */,
 				E2912F412079CAE100CBC298 /* Explosion.sks in Resources */,
+				E29D3E81213D497100C14A91 /* gun_sound_1.wav in Resources */,
 				E29C16C520033247002BAAF2 /* LaunchScreen.storyboard in Resources */,
 				E260212B213CF9B8003FAFB9 /* armor_sound.wav in Resources */,
 				E2CE1D2220510F1000C7C7E8 /* carrier.csv in Resources */,
-				E2912F67207C879F00CBC298 /* gun_sound_2.wav in Resources */,
-				E2912F6A207C879F00CBC298 /* gun_sound_4.wav in Resources */,
+				E29D3E80213D497100C14A91 /* gun_sound_2.wav in Resources */,
+				E29D3E7F213D497100C14A91 /* gun_sound_4.wav in Resources */,
+				E29D3E82213D497100C14A91 /* gun_sound_5.wav in Resources */,
 				E2912F74207F2E7600CBC298 /* switch_weapon.wav in Resources */,
+				E29D3E7C213D497100C14A91 /* gun_sound_3.wav in Resources */,
 				E260211A208C5B81003FAFB9 /* level_8.csv in Resources */,
 				E2CE1D242054F0AA00C7C7E8 /* level_2.csv in Resources */,
 				E29C16B920033247002BAAF2 /* Actions.sks in Resources */,
 				E2912F2D206786EC00CBC298 /* level_4.csv in Resources */,
 				E2912F442079D1E800CBC298 /* HitParticle.sks in Resources */,
 				E2602121213BD743003FAFB9 /* Supercharge.sks in Resources */,
-				E2912F69207C879F00CBC298 /* gun_sound_1.wav in Resources */,
 				E260212A213CF9B8003FAFB9 /* damaged_sound.wav in Resources */,
 				E278F6792067819300298489 /* test.csv in Resources */,
 				E278F67B2067844300298489 /* level_3.csv in Resources */,
+				E29D3E7E213D497100C14A91 /* bgm.wav in Resources */,
 				E2912F76207F2E7600CBC298 /* explosion_light.wav in Resources */,
+				E29D3E7D213D497100C14A91 /* crit_sound.wav in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

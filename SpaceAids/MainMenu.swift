@@ -22,9 +22,21 @@ class MainMenu: SKScene {
         fatalError("init(coder:) has not been implemented")
     }
     
+    func loadSound(){
+        SoundMaster.load(completion: loadPage);
+    }
+    
     func loadPage(){
-        SoundMaster.load();
+        //Start Button
+        start = SKSpriteNode(texture: SKTexture(imageNamed: "start_button"));
+        start?.position = CGPoint(x: 0, y: -500)
+        start?.name = "start"
         
+        self.addChild(start!)
+    }
+    
+    override func didMove(to view: SKView) {
+        Assets.load(completion: loadSound);
         self.backgroundColor = UIColor.black
         self.anchorPoint = CGPoint(x: 0.5, y: 0.5)
         
@@ -47,25 +59,16 @@ class MainMenu: SKScene {
         scoreLabelLabel?.fontColor = UIColor.white;
         scoreLabelLabel?.fontSize = 90;
         scoreLabelLabel?.position = CGPoint(x: 0, y: 0)
+        scoreLabelLabel?.fontName = "HelveticaNeue";
         
         scoreLabel = SKLabelNode(text: String(hs));
         scoreLabel?.fontColor = UIColor.white;
         scoreLabel?.fontSize = 60;
         scoreLabel?.position = CGPoint(x: 0, y: -100);
+        scoreLabel?.fontName = "HelveticaNeue";
         
         self.addChild(scoreLabelLabel!);
         self.addChild(scoreLabel!);
-        
-        //Start Button
-        start = SKSpriteNode(texture: SKTexture(imageNamed: "start_button"));
-        start?.position = CGPoint(x: 0, y: -500)
-        start?.name = "start"
-        
-        self.addChild(start!)
-    }
-    
-    override func didMove(to view: SKView) {
-        Assets.load(completion: loadPage);
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
